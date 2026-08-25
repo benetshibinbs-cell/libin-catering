@@ -98,7 +98,7 @@
 
       try {
         await window.handleAdminLogin(email, password);
-        window.location.href = 'dashboard.html';
+        window.location.replace('dashboard.html');
       } catch (err) {
         alert(err.message || 'Authentication failed. Please verify credentials.');
         submitBtn.disabled = false;
