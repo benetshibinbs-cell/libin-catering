@@ -60,10 +60,43 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
+  const fileInput = document.getElementById('eventFileInput');
+  const urlInput = document.getElementById('eventCoverImageUrl');
+  const previewWrap = document.getElementById('eventImagePreviewWrap');
+  const previewImg = document.getElementById('eventImagePreview');
+
+  function updatePreview(url) {
+    if (url && previewWrap && previewImg) {
+      previewImg.src = url;
+      previewWrap.style.display = 'block';
+    } else if (previewWrap) {
+      previewWrap.style.display = 'none';
+    }
+  }
+
+  if (fileInput) {
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (ev) => updatePreview(ev.target.result);
+        reader.readAsDataURL(file);
+      }
+    });
+  }
+
+  if (urlInput) {
+    urlInput.addEventListener('input', (e) => {
+      const val = e.target.value.trim();
+      if (val) updatePreview(val);
+    });
+  }
+
   if (addBtn) {
     addBtn.addEventListener('click', () => {
       if (form) form.reset();
       document.getElementById('eventId').value = '';
+      if (previewWrap) previewWrap.style.display = 'none';
       document.getElementById('modalTitle').textContent = 'Add Event Showcase';
       if (modal) modal.show();
     });
@@ -80,6 +113,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('eventLocation').value = evt.location || '';
     document.getElementById('eventGuestCount').value = evt.guest_count || '';
     document.getElementById('eventCoverImageUrl').value = evt.cover_image_url || '';
+    if (fileInput) fileInput.value = '';
+    updatePreview(evt.cover_image_url);
+
     document.getElementById('eventDescription').value = evt.description || '';
     document.getElementById('eventIsFeatured').checked = !!evt.is_featured;
     document.getElementById('eventIsPublished').checked = !!evt.is_published;
@@ -92,14 +128,29 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (form) {
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
+      const submitBtn = form.querySelector('button[type="submit"]');
+      const originalText = submitBtn.innerHTML;
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span> Uploading & Saving...`;
+
       const id = document.getElementById('eventId').value;
+      let imageUrl = document.getElementById('eventCoverImageUrl').value.trim();
+
+      if (fileInput && fileInput.files && fileInput.files[0]) {
+        try {
+          imageUrl = await window.DB.uploadImageFile(fileInput.files[0], 'events');
+        } catch (err) {
+          console.warn('Event image upload notice:', err);
+        }
+      }
+
       const payload = {
         title: document.getElementById('eventTitle').value.trim(),
         event_type: document.getElementById('eventType').value,
         event_date: document.getElementById('eventDate').value || null,
         location: document.getElementById('eventLocation').value.trim(),
         guest_count: document.getElementById('eventGuestCount').value ? parseInt(document.getElementById('eventGuestCount').value, 10) : null,
-        cover_image_url: document.getElementById('eventCoverImageUrl').value.trim(),
+        cover_image_url: imageUrl,
         description: document.getElementById('eventDescription').value.trim(),
         is_featured: document.getElementById('eventIsFeatured').checked,
         is_published: document.getElementById('eventIsPublished').checked,

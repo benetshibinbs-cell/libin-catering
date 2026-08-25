@@ -115,8 +115,21 @@
             </div>
 
             <div class="mb-3">
-              <label class="form-label">Image URL *</label>
-              <input type="url" id="galleryImageUrl" class="form-control" placeholder="https://images.unsplash.com/..." required>
+              <label class="form-label fw-bold">Gallery Photo (Upload File or Enter URL) *</label>
+              <div class="row g-2 align-items-center mb-2">
+                <div class="col-md-6">
+                  <input type="file" id="galleryFileInput" class="form-control" accept="image/*">
+                  <small class="text-muted">Upload photo from device</small>
+                </div>
+                <div class="col-md-6">
+                  <input type="url" id="galleryImageUrl" class="form-control" placeholder="Or paste image URL (https://...)">
+                  <small class="text-muted">Or web image link</small>
+                </div>
+              </div>
+              <div id="galleryImagePreviewWrap" class="mt-2 p-2 bg-light rounded text-center" style="display: none;">
+                <img id="galleryImagePreview" src="" alt="Preview" class="rounded shadow-sm" style="max-height: 130px; width: auto;">
+                <div class="small text-muted mt-1">Photo Preview</div>
+              </div>
             </div>
 
             <div class="mb-3">

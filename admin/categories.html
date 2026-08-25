@@ -108,8 +108,21 @@
             </div>
 
             <div class="mb-3">
-              <label class="form-label">Cover Image URL</label>
-              <input type="url" id="categoryImageUrl" class="form-control" placeholder="https://images.unsplash.com/...">
+              <label class="form-label fw-bold">Category Cover Image (Upload File or Enter URL)</label>
+              <div class="row g-2 align-items-center mb-2">
+                <div class="col-md-6">
+                  <input type="file" id="categoryFileInput" class="form-control" accept="image/*">
+                  <small class="text-muted">Upload photo from device</small>
+                </div>
+                <div class="col-md-6">
+                  <input type="url" id="categoryImageUrl" class="form-control" placeholder="Or paste image URL (https://...)">
+                  <small class="text-muted">Or web image link</small>
+                </div>
+              </div>
+              <div id="categoryImagePreviewWrap" class="mt-2 p-2 bg-light rounded text-center" style="display: none;">
+                <img id="categoryImagePreview" src="" alt="Preview" class="rounded shadow-sm" style="max-height: 120px; width: auto;">
+                <div class="small text-muted mt-1">Image Preview</div>
+              </div>
             </div>
 
             <div class="mb-3">

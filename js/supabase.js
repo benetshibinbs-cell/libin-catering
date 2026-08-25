@@ -177,6 +177,42 @@
       }
 
       return { success: true, local: true };
+    },
+
+    // Upload Image File to Supabase Storage Bucket ('media')
+    async uploadImageFile(file, folder = 'uploads') {
+      if (!file) return null;
+      const client = this.getClient();
+      
+      if (client && client.storage) {
+        try {
+          const fileExt = file.name.split('.').pop() || 'jpg';
+          const fileName = `${folder}/${Date.now()}_${Math.random().toString(36).substring(2, 7)}.${fileExt}`;
+          
+          const { data, error } = await client.storage.from('media').upload(fileName, file, {
+            cacheControl: '3600',
+            upsert: true
+          });
+
+          if (!error && data) {
+            const { data: publicUrlData } = client.storage.from('media').getPublicUrl(fileName);
+            if (publicUrlData && publicUrlData.publicUrl) {
+              return publicUrlData.publicUrl;
+            }
+          } else if (error) {
+            console.warn('Supabase storage upload error:', error.message);
+          }
+        } catch (e) {
+          console.warn('Storage upload exception:', e);
+        }
+      }
+
+      // Fallback: Read as base64 Data URL so the uploaded image displays and saves immediately
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (e) => resolve(e.target.result);
+        reader.readAsDataURL(file);
+      });
     }
   };
 

@@ -81,11 +81,44 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
+  const fileInput = document.getElementById('itemFileInput');
+  const urlInput = document.getElementById('itemImageUrl');
+  const previewWrap = document.getElementById('itemImagePreviewWrap');
+  const previewImg = document.getElementById('itemImagePreview');
+
+  function updatePreview(url) {
+    if (url && previewWrap && previewImg) {
+      previewImg.src = url;
+      previewWrap.style.display = 'block';
+    } else if (previewWrap) {
+      previewWrap.style.display = 'none';
+    }
+  }
+
+  if (fileInput) {
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (ev) => updatePreview(ev.target.result);
+        reader.readAsDataURL(file);
+      }
+    });
+  }
+
+  if (urlInput) {
+    urlInput.addEventListener('input', (e) => {
+      const val = e.target.value.trim();
+      if (val) updatePreview(val);
+    });
+  }
+
   // Open modal for new item
   if (addBtn) {
     addBtn.addEventListener('click', () => {
       if (menuForm) menuForm.reset();
       document.getElementById('itemId').value = '';
+      if (previewWrap) previewWrap.style.display = 'none';
       document.getElementById('modalTitle').textContent = 'Add Menu Item';
       if (menuModal) menuModal.show();
     });
@@ -103,6 +136,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('itemPrice').value = item.price || '';
     document.getElementById('itemEnquirePrice').checked = !!item.is_price_on_enquiry;
     document.getElementById('itemImageUrl').value = item.image_url || '';
+    if (fileInput) fileInput.value = '';
+    updatePreview(item.image_url);
+
     document.getElementById('itemDescription').value = item.description || '';
     document.getElementById('itemFeatured').checked = !!item.is_featured;
     document.getElementById('itemAvailable').checked = !!item.is_available;
@@ -116,14 +152,30 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (menuForm) {
     menuForm.addEventListener('submit', async (e) => {
       e.preventDefault();
+      const submitBtn = menuForm.querySelector('button[type="submit"]');
+      const originalText = submitBtn.innerHTML;
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span> Uploading & Saving...`;
+
       const id = document.getElementById('itemId').value;
+      let imageUrl = document.getElementById('itemImageUrl').value.trim();
+
+      // Check if file was uploaded
+      if (fileInput && fileInput.files && fileInput.files[0]) {
+        try {
+          imageUrl = await window.DB.uploadImageFile(fileInput.files[0], 'menu');
+        } catch (err) {
+          console.warn('File upload failed:', err);
+        }
+      }
+
       const payload = {
         name: document.getElementById('itemName').value.trim(),
         category_id: document.getElementById('itemCategory').value,
         dietary_type: document.getElementById('itemDietary').value,
         price: document.getElementById('itemPrice').value ? parseFloat(document.getElementById('itemPrice').value) : null,
         is_price_on_enquiry: document.getElementById('itemEnquirePrice').checked,
-        image_url: document.getElementById('itemImageUrl').value.trim(),
+        image_url: imageUrl,
         description: document.getElementById('itemDescription').value.trim(),
         is_featured: document.getElementById('itemFeatured').checked,
         is_available: document.getElementById('itemAvailable').checked,

@@ -57,10 +57,43 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
+  const fileInput = document.getElementById('categoryFileInput');
+  const urlInput = document.getElementById('categoryImageUrl');
+  const previewWrap = document.getElementById('categoryImagePreviewWrap');
+  const previewImg = document.getElementById('categoryImagePreview');
+
+  function updatePreview(url) {
+    if (url && previewWrap && previewImg) {
+      previewImg.src = url;
+      previewWrap.style.display = 'block';
+    } else if (previewWrap) {
+      previewWrap.style.display = 'none';
+    }
+  }
+
+  if (fileInput) {
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (ev) => updatePreview(ev.target.result);
+        reader.readAsDataURL(file);
+      }
+    });
+  }
+
+  if (urlInput) {
+    urlInput.addEventListener('input', (e) => {
+      const val = e.target.value.trim();
+      if (val) updatePreview(val);
+    });
+  }
+
   if (addBtn) {
     addBtn.addEventListener('click', () => {
       if (form) form.reset();
       document.getElementById('categoryId').value = '';
+      if (previewWrap) previewWrap.style.display = 'none';
       document.getElementById('modalTitle').textContent = 'Add Category';
       if (modal) modal.show();
     });
@@ -75,6 +108,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('categorySlug').value = cat.slug;
     document.getElementById('categoryDescription').value = cat.description || '';
     document.getElementById('categoryImageUrl').value = cat.image_url || '';
+    if (fileInput) fileInput.value = '';
+    updatePreview(cat.image_url);
+
     document.getElementById('categoryDisplayOrder').value = cat.display_order || 0;
     document.getElementById('categoryIsActive').checked = !!cat.is_active;
 
@@ -85,12 +121,27 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (form) {
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
+      const submitBtn = form.querySelector('button[type="submit"]');
+      const originalText = submitBtn.innerHTML;
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span> Uploading & Saving...`;
+
       const id = document.getElementById('categoryId').value;
+      let imageUrl = document.getElementById('categoryImageUrl').value.trim();
+
+      if (fileInput && fileInput.files && fileInput.files[0]) {
+        try {
+          imageUrl = await window.DB.uploadImageFile(fileInput.files[0], 'categories');
+        } catch (err) {
+          console.warn('Category image upload notice:', err);
+        }
+      }
+
       const payload = {
         name: document.getElementById('categoryName').value.trim(),
         slug: document.getElementById('categorySlug').value.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-'),
         description: document.getElementById('categoryDescription').value.trim(),
-        image_url: document.getElementById('categoryImageUrl').value.trim(),
+        image_url: imageUrl,
         display_order: parseInt(document.getElementById('categoryDisplayOrder').value || '0', 10),
         is_active: document.getElementById('categoryIsActive').checked
       };

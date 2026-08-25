@@ -57,10 +57,43 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
+  const fileInput = document.getElementById('galleryFileInput');
+  const urlInput = document.getElementById('galleryImageUrl');
+  const previewWrap = document.getElementById('galleryImagePreviewWrap');
+  const previewImg = document.getElementById('galleryImagePreview');
+
+  function updatePreview(url) {
+    if (url && previewWrap && previewImg) {
+      previewImg.src = url;
+      previewWrap.style.display = 'block';
+    } else if (previewWrap) {
+      previewWrap.style.display = 'none';
+    }
+  }
+
+  if (fileInput) {
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (ev) => updatePreview(ev.target.result);
+        reader.readAsDataURL(file);
+      }
+    });
+  }
+
+  if (urlInput) {
+    urlInput.addEventListener('input', (e) => {
+      const val = e.target.value.trim();
+      if (val) updatePreview(val);
+    });
+  }
+
   if (addBtn) {
     addBtn.addEventListener('click', () => {
       if (form) form.reset();
       document.getElementById('galleryId').value = '';
+      if (previewWrap) previewWrap.style.display = 'none';
       document.getElementById('modalTitle').textContent = 'Add Photo to Gallery';
       if (modal) modal.show();
     });
@@ -74,6 +107,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('galleryTitle').value = item.title || '';
     document.getElementById('galleryCategory').value = item.category || 'Food';
     document.getElementById('galleryImageUrl').value = item.image_url || '';
+    if (fileInput) fileInput.value = '';
+    updatePreview(item.image_url);
+
     document.getElementById('galleryCaption').value = item.caption || '';
     document.getElementById('galleryDisplayOrder').value = item.display_order || 0;
     document.getElementById('galleryIsPublished').checked = !!item.is_published;
@@ -85,11 +121,26 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (form) {
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
+      const submitBtn = form.querySelector('button[type="submit"]');
+      const originalText = submitBtn.innerHTML;
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span> Uploading & Saving...`;
+
       const id = document.getElementById('galleryId').value;
+      let imageUrl = document.getElementById('galleryImageUrl').value.trim();
+
+      if (fileInput && fileInput.files && fileInput.files[0]) {
+        try {
+          imageUrl = await window.DB.uploadImageFile(fileInput.files[0], 'gallery');
+        } catch (err) {
+          console.warn('Gallery image upload notice:', err);
+        }
+      }
+
       const payload = {
         title: document.getElementById('galleryTitle').value.trim(),
         category: document.getElementById('galleryCategory').value,
-        image_url: document.getElementById('galleryImageUrl').value.trim(),
+        image_url: imageUrl,
         caption: document.getElementById('galleryCaption').value.trim(),
         display_order: parseInt(document.getElementById('galleryDisplayOrder').value || '0', 10),
         is_published: document.getElementById('galleryIsPublished').checked
