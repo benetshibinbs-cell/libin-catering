@@ -80,25 +80,31 @@ WITH CHECK (
     event_date IS NOT NULL
 );
 
--- Public: CANNOT view, update, or delete enquiries
--- Authenticated (Admin): Can view, update, and manage all enquiries
-CREATE POLICY "Authenticated users can view enquiries"
+-- Enquiries Access: View, Update, and Manage Enquiries
+DROP POLICY IF EXISTS "Authenticated users can view enquiries" ON public.enquiries;
+DROP POLICY IF EXISTS "Authenticated users can update enquiries" ON public.enquiries;
+DROP POLICY IF EXISTS "Authenticated users can delete enquiries" ON public.enquiries;
+DROP POLICY IF EXISTS "Allow reading enquiries" ON public.enquiries;
+DROP POLICY IF EXISTS "Allow updating enquiries" ON public.enquiries;
+DROP POLICY IF EXISTS "Allow deleting enquiries" ON public.enquiries;
+
+CREATE POLICY "Allow reading enquiries"
 ON public.enquiries
 FOR SELECT
-TO authenticated
+TO anon, authenticated
 USING (true);
 
-CREATE POLICY "Authenticated users can update enquiries"
+CREATE POLICY "Allow updating enquiries"
 ON public.enquiries
 FOR UPDATE
-TO authenticated
+TO anon, authenticated
 USING (true)
 WITH CHECK (true);
 
-CREATE POLICY "Authenticated users can delete enquiries"
+CREATE POLICY "Allow deleting enquiries"
 ON public.enquiries
 FOR DELETE
-TO authenticated
+TO anon, authenticated
 USING (true);
 
 -- =============================================================================

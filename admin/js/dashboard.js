@@ -17,13 +17,30 @@ document.addEventListener('DOMContentLoaded', async () => {
       const events = await window.DB.getEvents({ publishedOnly: false });
 
       let enquiries = [];
+      let dbEnquiries = [];
+      let localEnquiries = [];
+
+      try {
+        localEnquiries = JSON.parse(localStorage.getItem('libin_offline_enquiries') || '[]');
+      } catch (e) {}
+
       const client = window.DB.getClient();
       if (client) {
-        const { data } = await client.from('enquiries').select('*').order('created_at', { ascending: false });
-        if (data) enquiries = data;
-      } else {
-        enquiries = JSON.parse(localStorage.getItem('libin_offline_enquiries') || '[]');
+        try {
+          const { data, error } = await client.from('enquiries').select('*').order('created_at', { ascending: false });
+          if (error) console.warn('Dashboard enquiries query notice:', error.message);
+          if (data && data.length > 0) dbEnquiries = data;
+        } catch (err) {
+          console.warn('Dashboard fetch exception:', err);
+        }
       }
+
+      const mergedMap = new Map();
+      dbEnquiries.forEach(i => mergedMap.set(i.id, i));
+      localEnquiries.forEach(i => {
+        if (!mergedMap.has(i.id)) mergedMap.set(i.id, i);
+      });
+      enquiries = Array.from(mergedMap.values());
 
       if (countMenuEl) countMenuEl.textContent = menuItems.length;
       if (countCategoryEl) countCategoryEl.textContent = categories.length;

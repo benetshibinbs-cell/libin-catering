@@ -21,13 +21,35 @@ document.addEventListener('DOMContentLoaded', async () => {
     tableBody.innerHTML = `<tr><td colspan="7" class="text-center py-4"><span class="spinner-border spinner-border-sm"></span> Loading enquiries...</td></tr>`;
 
     const client = window.DB.getClient();
+    let dbEnquiries = [];
+    let localEnquiries = [];
+
+    try {
+      localEnquiries = JSON.parse(localStorage.getItem('libin_offline_enquiries') || '[]');
+    } catch (e) {}
+
     if (client) {
-      const { data } = await client.from('enquiries').select('*').order('created_at', { ascending: false });
-      enquiries = data || [];
-    } else {
-      enquiries = JSON.parse(localStorage.getItem('libin_offline_enquiries') || '[]');
+      try {
+        const { data, error } = await client.from('enquiries').select('*').order('created_at', { ascending: false });
+        if (error) {
+          console.warn('Supabase enquiries query notice (check RLS policy):', error.message);
+        }
+        if (data && data.length > 0) {
+          dbEnquiries = data;
+        }
+      } catch (err) {
+        console.error('Supabase fetch exception:', err);
+      }
     }
 
+    // Merge Supabase enquiries and local enquiries without duplicate IDs
+    const mergedMap = new Map();
+    dbEnquiries.forEach(item => mergedMap.set(item.id, item));
+    localEnquiries.forEach(item => {
+      if (!mergedMap.has(item.id)) mergedMap.set(item.id, item);
+    });
+
+    enquiries = Array.from(mergedMap.values());
     renderTable();
   }
 
