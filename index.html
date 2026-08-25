@@ -90,8 +90,17 @@
   <!-- =========================================================================
        2. Hero Section (Cinematic)
        ========================================================================= -->
-  <section class="hero-section">
-    <div class="container">
+  <section class="hero-section position-relative">
+    <!-- Atmospheric Fire & Fog Visual Effects -->
+    <div class="hero-fx-container" aria-hidden="true">
+      <div class="hero-fog-layer fog-back"></div>
+      <div class="hero-fog-layer fog-mid"></div>
+      <canvas id="heroFireCanvas" class="hero-fire-canvas"></canvas>
+      <div class="hero-fog-layer fog-front"></div>
+      <div class="hero-fire-glow"></div>
+    </div>
+
+    <div class="container position-relative" style="z-index: 3;">
       <div class="row align-items-center">
         <div class="col-lg-8 col-xl-7">
           <div class="hero-badge">
