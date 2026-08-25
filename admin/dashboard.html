@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard | Libin Catering Service & Event Management</title>
+  <link rel="icon" type="image/png" href="../assets/images/logo.png">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Bootstrap 5 & Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/animations.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+</head>
+<body class="admin-body">
+
+  <div class="admin-wrapper">
+    <!-- Sidebar -->
+    <aside class="admin-sidebar" id="adminSidebar">
+      <div class="admin-sidebar-brand">
+        <img src="../assets/images/logo.png" alt="Libin Catering">
+      </div>
+      <nav class="admin-nav">
+        <a href="dashboard.html" class="admin-nav-link active"><i class="bi bi-speedometer2"></i> Dashboard</a>
+        <a href="menu.html" class="admin-nav-link"><i class="bi bi-book"></i> Menu Items</a>
+        <a href="categories.html" class="admin-nav-link"><i class="bi bi-tags"></i> Categories</a>
+        <a href="events.html" class="admin-nav-link"><i class="bi bi-calendar-event"></i> Events</a>
+        <a href="enquiries.html" class="admin-nav-link"><i class="bi bi-envelope-paper"></i> Enquiries</a>
+        <a href="gallery.html" class="admin-nav-link"><i class="bi bi-images"></i> Gallery</a>
+        <a href="contact.html" class="admin-nav-link"><i class="bi bi-geo-alt"></i> Contact Info</a>
+        <hr class="my-3 border-secondary">
+        <a href="../index.html" target="_blank" class="admin-nav-link"><i class="bi bi-box-arrow-up-right"></i> View Live Site</a>
+        <a href="#" class="admin-nav-link text-danger" data-action="admin-logout"><i class="bi bi-box-arrow-left text-danger"></i> Logout</a>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="admin-content">
+      <!-- Topbar -->
+      <header class="admin-topbar">
+        <div class="d-flex align-items-center gap-3">
+          <button class="btn btn-sm btn-outline-dark d-lg-none" id="toggleSidebar">
+            <i class="bi bi-list fs-5"></i>
+          </button>
+          <h4 class="font-serif mb-0">Overview & Management</h4>
+        </div>
+        <div class="d-flex align-items-center gap-3">
+          <span class="small text-muted d-none d-md-inline" id="adminUserEmail">admin@libincatering.com</span>
+          <button class="btn btn-sm btn-outline-danger" data-action="admin-logout">
+            <i class="bi bi-power"></i>
+          </button>
+        </div>
+      </header>
+
+      <!-- Main Container -->
+      <div class="admin-main-container">
+        <!-- Stat Cards -->
+        <div class="row g-4 mb-4">
+          <div class="col-sm-6 col-xl-3">
+            <div class="stat-card">
+              <div>
+                <div class="stat-card-title">Menu Items</div>
+                <div class="stat-card-val" id="countMenuItems">0</div>
+              </div>
+              <div class="stat-card-icon"><i class="bi bi-egg-fried"></i></div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-xl-3">
+            <div class="stat-card">
+              <div>
+                <div class="stat-card-title">Categories</div>
+                <div class="stat-card-val" id="countCategories">0</div>
+              </div>
+              <div class="stat-card-icon"><i class="bi bi-tags-fill"></i></div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-xl-3">
+            <div class="stat-card">
+              <div>
+                <div class="stat-card-title">Upcoming Events</div>
+                <div class="stat-card-val" id="countEvents">0</div>
+              </div>
+              <div class="stat-card-icon"><i class="bi bi-calendar-check-fill"></i></div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-xl-3">
+            <div class="stat-card">
+              <div>
+                <div class="stat-card-title">New Enquiries</div>
+                <div class="stat-card-val text-primary" id="countEnquiries">0</div>
+              </div>
+              <div class="stat-card-icon"><i class="bi bi-envelope-exclamation-fill text-primary"></i></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Actions Row -->
+        <div class="admin-card mb-4">
+          <div class="admin-card-header">
+            <h5 class="font-serif mb-0">Quick Management Actions</h5>
+          </div>
+          <div class="admin-card-body">
+            <div class="d-flex flex-wrap gap-2">
+              <a href="menu.html" class="btn btn-gold btn-sm"><i class="bi bi-plus-circle me-1"></i> Add Menu Item</a>
+              <a href="categories.html" class="btn btn-outline-dark btn-sm"><i class="bi bi-tag me-1"></i> Add Category</a>
+              <a href="events.html" class="btn btn-outline-dark btn-sm"><i class="bi bi-calendar-plus me-1"></i> Add Event</a>
+              <a href="gallery.html" class="btn btn-outline-dark btn-sm"><i class="bi bi-image me-1"></i> Upload Photo</a>
+              <a href="enquiries.html" class="btn btn-primary btn-sm"><i class="bi bi-inboxes me-1"></i> View All Enquiries</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Enquiries Feed -->
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <h5 class="font-serif mb-0">Recent Customer Enquiries</h5>
+            <a href="enquiries.html" class="btn btn-sm btn-link text-decoration-none">View All &rarr;</a>
+          </div>
+          <div class="admin-card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-custom table-hover align-middle mb-0">
+                <thead>
+                  <tr>
+                    <th>Customer Name</th>
+                    <th>Event Type</th>
+                    <th>Event Date</th>
+                    <th>Guests</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="recentEnquiriesTableBody">
+                  <!-- Rendered via js/dashboard.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/config.js"></script>
+  <script src="../js/supabase.js"></script>
+  <script src="../js/app.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/dashboard.js"></script>
+
+  <script>
+    document.getElementById('toggleSidebar')?.addEventListener('click', () => {
+      document.getElementById('adminSidebar')?.classList.toggle('show');
+    });
+  </script>
+</body>
+</html>

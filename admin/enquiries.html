@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Customer Enquiries | Admin Portal</title>
+  <link rel="icon" type="image/png" href="../assets/images/logo.png">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Bootstrap 5 & Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/animations.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+</head>
+<body class="admin-body">
+
+  <div class="admin-wrapper">
+    <!-- Sidebar -->
+    <aside class="admin-sidebar" id="adminSidebar">
+      <div class="admin-sidebar-brand">
+        <img src="../assets/images/logo.png" alt="Libin Catering">
+      </div>
+      <nav class="admin-nav">
+        <a href="dashboard.html" class="admin-nav-link"><i class="bi bi-speedometer2"></i> Dashboard</a>
+        <a href="menu.html" class="admin-nav-link"><i class="bi bi-book"></i> Menu Items</a>
+        <a href="categories.html" class="admin-nav-link"><i class="bi bi-tags"></i> Categories</a>
+        <a href="events.html" class="admin-nav-link"><i class="bi bi-calendar-event"></i> Events</a>
+        <a href="enquiries.html" class="admin-nav-link active"><i class="bi bi-envelope-paper"></i> Enquiries</a>
+        <a href="gallery.html" class="admin-nav-link"><i class="bi bi-images"></i> Gallery</a>
+        <a href="contact.html" class="admin-nav-link"><i class="bi bi-geo-alt"></i> Contact Info</a>
+        <hr class="my-3 border-secondary">
+        <a href="../index.html" target="_blank" class="admin-nav-link"><i class="bi bi-box-arrow-up-right"></i> View Live Site</a>
+        <a href="#" class="admin-nav-link text-danger" data-action="admin-logout"><i class="bi bi-box-arrow-left text-danger"></i> Logout</a>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="admin-content">
+      <header class="admin-topbar">
+        <div class="d-flex align-items-center gap-3">
+          <button class="btn btn-sm btn-outline-dark d-lg-none" id="toggleSidebar">
+            <i class="bi bi-list fs-5"></i>
+          </button>
+          <h4 class="font-serif mb-0">Customer Event Enquiries</h4>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <label class="small text-muted mb-0 d-none d-sm-inline">Status:</label>
+          <select id="statusFilter" class="form-select form-select-sm" style="width: 160px;">
+            <option value="all">All Enquiries</option>
+            <option value="New">New</option>
+            <option value="Contacted">Contacted</option>
+            <option value="In Discussion">In Discussion</option>
+            <option value="Confirmed">Confirmed</option>
+            <option value="Completed">Completed</option>
+            <option value="Cancelled">Cancelled</option>
+          </select>
+        </div>
+      </header>
+
+      <div class="admin-main-container">
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <h5 class="font-serif mb-0">Enquiry Pipeline</h5>
+          </div>
+          <div class="admin-card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-custom table-hover align-middle mb-0">
+                <thead>
+                  <tr>
+                    <th>Customer Name & Phone</th>
+                    <th>Event Type</th>
+                    <th>Event Date</th>
+                    <th>Guests</th>
+                    <th>Status</th>
+                    <th>Submitted</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="adminEnquiryTableBody">
+                  <!-- Rendered via js/enquiry-admin.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Enquiry Detail Modal -->
+  <div class="modal fade" id="enquiryDetailModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content border-0 shadow-lg">
+        <div class="modal-header bg-noir text-white py-3">
+          <h5 class="modal-title font-serif">Review Event Enquiry</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body p-4 bg-white">
+          <form id="enquiryDetailForm">
+            <input type="hidden" id="modalEnqId">
+
+            <div class="row g-3 mb-3 border-bottom pb-3">
+              <div class="col-md-6">
+                <small class="text-muted text-uppercase fw-bold d-block">Customer Name</small>
+                <div class="fs-5 fw-bold" id="modalEnqName"></div>
+              </div>
+              <div class="col-md-6">
+                <small class="text-muted text-uppercase fw-bold d-block">Phone / WhatsApp</small>
+                <div class="fs-6" id="modalEnqPhone"></div>
+              </div>
+              <div class="col-md-6">
+                <small class="text-muted text-uppercase fw-bold d-block">Email</small>
+                <div class="fs-6" id="modalEnqEmail"></div>
+              </div>
+              <div class="col-md-6">
+                <small class="text-muted text-uppercase fw-bold d-block">Event Type</small>
+                <div class="fs-6 fw-semibold text-primary" id="modalEnqType"></div>
+              </div>
+            </div>
+
+            <div class="row g-3 mb-3 border-bottom pb-3">
+              <div class="col-md-4">
+                <small class="text-muted text-uppercase fw-bold d-block">Event Date</small>
+                <div class="fs-6 fw-semibold" id="modalEnqDate"></div>
+              </div>
+              <div class="col-md-4">
+                <small class="text-muted text-uppercase fw-bold d-block">Guest Count</small>
+                <div class="fs-6 fw-semibold" id="modalEnqGuests"></div>
+              </div>
+              <div class="col-md-4">
+                <small class="text-muted text-uppercase fw-bold d-block">Budget</small>
+                <div class="fs-6 fw-semibold" id="modalEnqBudget"></div>
+              </div>
+              <div class="col-12">
+                <small class="text-muted text-uppercase fw-bold d-block">Venue Location</small>
+                <div class="fs-6" id="modalEnqVenue"></div>
+              </div>
+            </div>
+
+            <div class="row g-3 mb-3 border-bottom pb-3">
+              <div class="col-md-6">
+                <small class="text-muted text-uppercase fw-bold d-block">Services Requested</small>
+                <div class="small" id="modalEnqServices"></div>
+              </div>
+              <div class="col-md-6">
+                <small class="text-muted text-uppercase fw-bold d-block">Food Preferences</small>
+                <div class="small" id="modalEnqFood"></div>
+              </div>
+              <div class="col-12">
+                <small class="text-muted text-uppercase fw-bold d-block">Customer Notes / Message</small>
+                <div class="p-2 bg-light rounded small" id="modalEnqMessage"></div>
+              </div>
+            </div>
+
+            <div class="row g-3 mb-3">
+              <div class="col-md-5">
+                <label class="form-label fw-bold">Update Status</label>
+                <select id="modalEnqStatusSelect" class="form-select" required>
+                  <option value="New">New</option>
+                  <option value="Contacted">Contacted</option>
+                  <option value="In Discussion">In Discussion</option>
+                  <option value="Confirmed">Confirmed</option>
+                  <option value="Completed">Completed</option>
+                  <option value="Cancelled">Cancelled</option>
+                </select>
+              </div>
+              <div class="col-md-7">
+                <label class="form-label fw-bold">Internal Admin Notes</label>
+                <textarea id="modalEnqAdminNotes" class="form-control" rows="2" placeholder="e.g. Quoted ₹450/plate for 500 pax, awaiting advance..."></textarea>
+              </div>
+            </div>
+
+            <div class="d-flex justify-content-end gap-2">
+              <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="submit" class="btn btn-gold">Update Enquiry Status</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/config.js"></script>
+  <script src="../js/supabase.js"></script>
+  <script src="../js/app.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/enquiry-admin.js"></script>
+
+  <script>
+    document.getElementById('toggleSidebar')?.addEventListener('click', () => {
+      document.getElementById('adminSidebar')?.classList.toggle('show');
+    });
+  </script>
+</body>
+</html>

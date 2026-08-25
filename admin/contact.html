@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact & Settings | Admin Portal</title>
+  <link rel="icon" type="image/png" href="../assets/images/logo.png">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Bootstrap 5 & Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/animations.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+</head>
+<body class="admin-body">
+
+  <div class="admin-wrapper">
+    <!-- Sidebar -->
+    <aside class="admin-sidebar" id="adminSidebar">
+      <div class="admin-sidebar-brand">
+        <img src="../assets/images/logo.png" alt="Libin Catering">
+      </div>
+      <nav class="admin-nav">
+        <a href="dashboard.html" class="admin-nav-link"><i class="bi bi-speedometer2"></i> Dashboard</a>
+        <a href="menu.html" class="admin-nav-link"><i class="bi bi-book"></i> Menu Items</a>
+        <a href="categories.html" class="admin-nav-link"><i class="bi bi-tags"></i> Categories</a>
+        <a href="events.html" class="admin-nav-link"><i class="bi bi-calendar-event"></i> Events</a>
+        <a href="enquiries.html" class="admin-nav-link"><i class="bi bi-envelope-paper"></i> Enquiries</a>
+        <a href="gallery.html" class="admin-nav-link"><i class="bi bi-images"></i> Gallery</a>
+        <a href="contact.html" class="admin-nav-link active"><i class="bi bi-geo-alt"></i> Contact Info</a>
+        <hr class="my-3 border-secondary">
+        <a href="../index.html" target="_blank" class="admin-nav-link"><i class="bi bi-box-arrow-up-right"></i> View Live Site</a>
+        <a href="#" class="admin-nav-link text-danger" data-action="admin-logout"><i class="bi bi-box-arrow-left text-danger"></i> Logout</a>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="admin-content">
+      <header class="admin-topbar">
+        <div class="d-flex align-items-center gap-3">
+          <button class="btn btn-sm btn-outline-dark d-lg-none" id="toggleSidebar">
+            <i class="bi bi-list fs-5"></i>
+          </button>
+          <h4 class="font-serif mb-0">Business Info & Contact Settings</h4>
+        </div>
+      </header>
+
+      <div class="admin-main-container">
+        <div class="row justify-content-center">
+          <div class="col-lg-10">
+            <div class="admin-card">
+              <div class="admin-card-header">
+                <h5 class="font-serif mb-0">Public Business Profile</h5>
+              </div>
+              <div class="admin-card-body">
+                <form id="contactAdminForm">
+                  <div class="mb-3">
+                    <label class="form-label fw-bold">Business Name *</label>
+                    <input type="text" id="businessName" class="form-control" value="Libin Catering Service & Event Management" required>
+                  </div>
+
+                  <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                      <label class="form-label fw-bold">Primary Phone *</label>
+                      <input type="text" id="primaryPhone" class="form-control" value="+91 9677476609" required>
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label fw-bold">Secondary Phone</label>
+                      <input type="text" id="secondaryPhone" class="form-control" value="+91 9442779796">
+                    </div>
+                  </div>
+
+                  <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                      <label class="form-label fw-bold">WhatsApp Number *</label>
+                      <input type="text" id="whatsappNumber" class="form-control" value="+91 9442779796" required>
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label fw-bold">Official Email *</label>
+                      <input type="email" id="businessEmail" class="form-control" value="libincateringservice@gmail.com" required>
+                    </div>
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label fw-bold">Physical Address</label>
+                    <textarea id="businessAddress" class="form-control" rows="2">Libin Catering Service & Event Management, Tamil Nadu, India</textarea>
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label fw-bold">Google Maps Embed URL (iframe src)</label>
+                    <input type="url" id="mapEmbedUrl" class="form-control" placeholder="https://www.google.com/maps/embed?...">
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label fw-bold">Operating Hours</label>
+                    <input type="text" id="openingHours" class="form-control" value="Monday - Sunday: 7:00 AM - 10:30 PM (24/7 Event Booking)">
+                  </div>
+
+                  <h6 class="font-serif fw-bold mt-4 mb-3 border-top pt-3">Social Media Links</h6>
+                  <div class="row g-3 mb-4">
+                    <div class="col-md-4">
+                      <label class="form-label">Facebook URL</label>
+                      <input type="url" id="facebookUrl" class="form-control" placeholder="https://facebook.com/...">
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label">Instagram URL</label>
+                      <input type="url" id="instagramUrl" class="form-control" placeholder="https://instagram.com/...">
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label">YouTube URL</label>
+                      <input type="url" id="youtubeUrl" class="form-control" placeholder="https://youtube.com/...">
+                    </div>
+                  </div>
+
+                  <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-gold py-2 px-4">
+                      <i class="bi bi-save me-1"></i> Save Changes
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/config.js"></script>
+  <script src="../js/supabase.js"></script>
+  <script src="../js/app.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/contact-admin.js"></script>
+
+  <script>
+    document.getElementById('toggleSidebar')?.addEventListener('click', () => {
+      document.getElementById('adminSidebar')?.classList.toggle('show');
+    });
+  </script>
+</body>
+</html>
