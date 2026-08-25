@@ -155,7 +155,7 @@
   pointer-events: none;
 }
 
-.hero-fire-canvas {
+.hero-atmosphere-canvas {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -163,6 +163,14 @@
   pointer-events: none;
   z-index: 2;
   mix-blend-mode: screen;
+}
+
+.hero-fx-fallback {
+  position: absolute;
+  inset: 0;
+  display: none;
+  pointer-events: none;
+  z-index: 1;
 }
 
 @keyframes fogDriftSlow {
