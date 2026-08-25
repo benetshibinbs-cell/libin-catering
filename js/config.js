@@ -7,8 +7,8 @@ window.APP_CONFIG = {
   // Supabase Configuration
   // Provide your project URL & Publishable Anon Key below or through window.ENV in production.
   // Note: NEVER place service_role keys or secret keys in this file.
-  supabaseUrl: (window.ENV && window.ENV.SUPABASE_URL) || 'https://your-project.supabase.co',
-  supabaseAnonKey: (window.ENV && window.ENV.SUPABASE_PUBLISHABLE_KEY) || 'your_publishable_key_here',
+  supabaseUrl: (window.ENV && window.ENV.SUPABASE_URL) || 'https://robzbfskdmwhltfmvfsu.supabase.co',
+  supabaseAnonKey: (window.ENV && window.ENV.SUPABASE_PUBLISHABLE_KEY) || 'sb_publishable_sD3Q6-t7ftBQTIhUTHaE_w_jChKouOe',
 
   // Business Information
   business: {
