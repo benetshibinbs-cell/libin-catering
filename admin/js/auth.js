@@ -1,12 +1,15 @@
 /**
  * LIBIN CATERING SERVICE & EVENT MANAGEMENT
- * Robust Admin Authentication Controller
+ * Bulletproof Admin Authentication Controller
  */
 
 (function () {
+  let isRedirecting = false;
+
   function isCurrentPageLogin() {
-    const path = (window.location.pathname || '').toLowerCase().replace(/\\/g, '/');
-    return path.endsWith('/login.html') || path.endsWith('/login') || path.endsWith('login.html');
+    const cleanPath = (window.location.pathname || '').toLowerCase().replace(/\\/g, '/');
+    const filename = cleanPath.split('/').pop();
+    return filename === 'login.html' || filename === 'login';
   }
 
   function getClient() {
@@ -16,75 +19,71 @@
     return null;
   }
 
-  // Check if user is marked as logged in
-  function isAuthenticated() {
-    return localStorage.getItem('libin_admin_logged_in') === 'true' || 
-           sessionStorage.getItem('libin_admin_logged_in') === 'true';
+  // Safe single redirect
+  function safeRedirect(targetUrl) {
+    if (isRedirecting) return;
+    const currentFile = (window.location.pathname || '').split('/').pop().toLowerCase();
+    if (currentFile === targetUrl.toLowerCase()) return;
+
+    isRedirecting = true;
+    window.location.replace(targetUrl);
   }
 
-  function setAuthenticated(email) {
-    localStorage.setItem('libin_admin_logged_in', 'true');
-    localStorage.setItem('libin_admin_email', email || 'admin@libincatering.com');
-    sessionStorage.setItem('libin_admin_logged_in', 'true');
-    sessionStorage.setItem('libin_admin_email', email || 'admin@libincatering.com');
-  }
-
-  function clearAuthenticated() {
-    localStorage.removeItem('libin_admin_logged_in');
+  // Clean all auth traces
+  function purgeAuthStorage() {
+    localStorage.removeItem('libin_demo_auth');
     localStorage.removeItem('libin_admin_email');
-    sessionStorage.removeItem('libin_admin_logged_in');
+    sessionStorage.removeItem('libin_demo_auth');
     sessionStorage.removeItem('libin_admin_email');
+
+    // Remove any orphaned Supabase local storage tokens
+    try {
+      Object.keys(localStorage).forEach(key => {
+        if (key.startsWith('sb-') && key.endsWith('-auth-token')) {
+          localStorage.removeItem(key);
+        }
+      });
+    } catch (e) {}
   }
 
-  // Session route guard
+  // Main Route Guard & Session Check
   async function checkAuth() {
     const isLogin = isCurrentPageLogin();
-    const loggedIn = isAuthenticated();
-
-    // 1. If user is logged in and on login page, redirect to dashboard once
-    if (loggedIn && isLogin) {
-      window.location.replace('dashboard.html');
-      return;
-    }
-
-    // 2. If user is NOT logged in and on protected admin page, redirect to login once
-    if (!loggedIn && !isLogin) {
-      window.location.replace('login.html');
-      return;
-    }
-
-    // 3. Supabase Auth state listener for token verification
     const client = getClient();
+    let session = null;
+    let isDemoUser = localStorage.getItem('libin_demo_auth') === 'true';
+
     if (client) {
       try {
-        const { data: { session } } = await client.auth.getSession();
-        if (session && session.user) {
-          setAuthenticated(session.user.email);
-          if (isLogin) {
-            window.location.replace('dashboard.html');
-          }
+        const { data } = await client.auth.getSession();
+        if (data && data.session && data.session.user) {
+          session = data.session;
         }
       } catch (err) {
-        console.warn('Auth session check notice:', err);
+        console.warn('Session verification notice:', err);
       }
+    }
 
-      // Listen for background auth changes
-      try {
-        client.auth.onAuthStateChange((event, session) => {
-          if (session && session.user) {
-            setAuthenticated(session.user.email);
-            if (isCurrentPageLogin()) {
-              window.location.replace('dashboard.html');
-            }
-          } else if (event === 'SIGNED_OUT') {
-            clearAuthenticated();
-            if (!isCurrentPageLogin()) {
-              window.location.replace('login.html');
-            }
-          }
-        });
-      } catch (e) {
-        console.warn('Auth listener notice:', e);
+    const isLoggedIn = !!(session || isDemoUser);
+
+    if (isLoggedIn) {
+      // User is logged in
+      const userEmail = (session && session.user && session.user.email) || 
+                        localStorage.getItem('libin_admin_email') || 
+                        'admin@libincatering.com';
+      
+      localStorage.setItem('libin_admin_email', userEmail);
+
+      const userEmailEl = document.getElementById('adminUserEmail');
+      if (userEmailEl) userEmailEl.textContent = userEmail;
+
+      if (isLogin) {
+        safeRedirect('dashboard.html');
+      }
+    } else {
+      // User is NOT logged in
+      if (!isLogin) {
+        safeRedirect('login.html');
       }
     }
   }
@@ -96,18 +95,18 @@
     if (client) {
       const { data, error } = await client.auth.signInWithPassword({ email, password });
       if (error) {
-        // If Supabase authentication fails, check error
         throw error;
       }
       if (data && data.user) {
-        setAuthenticated(data.user.email || email);
+        localStorage.setItem('libin_admin_email', data.user.email || email);
         return data;
       }
     }
 
-    // Local demo authentication fallback (if Supabase user not created yet)
+    // Local Demo Login fallback (if testing before creating Supabase user)
     if (email && password && password.length >= 6) {
-      setAuthenticated(email);
+      localStorage.setItem('libin_demo_auth', 'true');
+      localStorage.setItem('libin_admin_email', email);
       return { user: { email } };
     } else {
       throw new Error('Please enter a valid email and password (minimum 6 characters).');
@@ -116,19 +115,23 @@
 
   // Sign Out Handler
   window.handleAdminLogout = async function () {
+    if (isRedirecting) return;
+    isRedirecting = true;
+
     const client = getClient();
     if (client) {
       try {
         await client.auth.signOut();
       } catch (e) {
-        console.warn('Signout warning:', e);
+        console.warn('Supabase signout notice:', e);
       }
     }
-    clearAuthenticated();
+
+    purgeAuthStorage();
     window.location.replace('login.html');
   };
 
-  // Run on DOM ready
+  // Run on page load
   document.addEventListener('DOMContentLoaded', () => {
     checkAuth();
 
@@ -139,12 +142,5 @@
         window.handleAdminLogout();
       });
     });
-
-    // Populate user email if element exists
-    const userEmailEl = document.getElementById('adminUserEmail');
-    if (userEmailEl) {
-      const email = localStorage.getItem('libin_admin_email') || sessionStorage.getItem('libin_admin_email') || 'admin@libincatering.com';
-      userEmailEl.textContent = email;
-    }
   });
 })();
