@@ -13,8 +13,11 @@
   <meta property="og:type" content="website">
   <meta property="og:image" content="assets/images/logo.png">
 
-  <!-- Favicon -->
-  <link rel="icon" type="image/png" href="assets/images/logo.png">
+  <!-- Favicon & Touch Icons -->
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/icons/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon.png">
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -43,9 +46,16 @@
     "priceRange": "$$",
     "address": {
       "@type": "PostalAddress",
+      "streetAddress": "Libin Catering Services",
       "addressLocality": "Tamil Nadu",
       "addressCountry": "IN"
-    }
+    },
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": 8.3078817,
+      "longitude": 77.1311018
+    },
+    "hasMap": "https://www.google.com/maps/place/Libin+Catering+Services/@8.3078817,77.1311018,17z/data=!3m1!4b1!4m6!3m5!1s0x3b05ab04435abe27:0x12a4c587ff77f9e!8m2!3d8.3078817!4d77.1311018!16s%2Fg%2F11j7dyx0g3"
   }
   </script>
 </head>
@@ -88,9 +98,18 @@
   </nav>
 
   <!-- =========================================================================
-       2. Hero Section (Cinematic)
+       2. Hero Section (Cinematic Slider)
        ========================================================================= -->
   <section class="hero-section position-relative">
+    <!-- Cinematic 4-Slide South Indian & Kerala Culinary Carousel -->
+    <div class="hero-slider" id="heroSlider" aria-hidden="true">
+      <div class="hero-slide active" style="background-image: url('assets/images/hero-slide-1.jpg');" data-index="0" data-dish="Kerala Malabar Dum Biryani"></div>
+      <div class="hero-slide" style="background-image: url('assets/images/hero-slide-2.jpg');" data-index="1" data-dish="Authentic Kerala Nool Parotta"></div>
+      <div class="hero-slide" style="background-image: url('assets/images/hero-slide-4.jpg');" data-index="2" data-dish="Traditional Kerala Sadhya Feast"></div>
+      <div class="hero-slide" style="background-image: url('assets/images/hero-slide-3.jpg');" data-index="3" data-dish="Grand South Indian Banquet & Live Counters"></div>
+      <div class="hero-slider-overlay"></div>
+    </div>
+
     <!-- Atmospheric Fire & Fog Visual Effects (WebGL Three.js + Fallback) -->
     <div class="hero-fx-container" aria-hidden="true">
       <canvas id="heroAtmosphereCanvas" class="hero-atmosphere-canvas"></canvas>
@@ -105,8 +124,14 @@
     <div class="container position-relative" style="z-index: 3;">
       <div class="row align-items-center">
         <div class="col-lg-8 col-xl-7">
-          <div class="hero-badge">
-            <i class="bi bi-stars"></i> Premium Catering & Event Management
+          <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+            <div class="hero-badge mb-0">
+              <i class="bi bi-stars"></i> Premium Catering & Event Management
+            </div>
+            <a href="https://www.google.com/maps/place/Libin+Catering+Services/@8.3078817,77.1311018,17z/data=!4m8!3m7!1s0x3b05ab04435abe27:0x12a4c587ff77f9e!8m2!3d8.3078817!4d77.1311018!9m1!1b1!16s%2Fg%2F11j7dyx0g3" target="_blank" rel="noopener noreferrer" class="google-trust-badge-hero" data-bind="google-reviews-href">
+              <svg width="15" height="15" viewBox="0 0 24 24" class="me-1"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+              <span class="text-warning">★ <strong data-bind="google-rating">4.9</strong></span> on Google (<span data-bind="google-review-count">150+</span> Reviews)
+            </a>
           </div>
           <h1 class="hero-title font-serif">
             Exceptional Food. <br>
@@ -123,6 +148,23 @@
             <a href="contact.html#enquiry-form" class="btn btn-outline-white">
               <i class="bi bi-calendar-check"></i> Plan Your Event
             </a>
+          </div>
+
+          <!-- Interactive Culinary Slider Control Pills -->
+          <div class="hero-slider-nav" id="heroSliderNav">
+            <span class="small text-white-50 me-1"><i class="bi bi-fire text-gold me-1"></i> Border Specialties:</span>
+            <button type="button" class="hero-slider-dot active" data-slide="0">
+              <span class="dot-indicator"></span> Wood-Fired Dum Biryani
+            </button>
+            <button type="button" class="hero-slider-dot" data-slide="1">
+              <span class="dot-indicator"></span> Live Parotta & Salna
+            </button>
+            <button type="button" class="hero-slider-dot" data-slide="2">
+              <span class="dot-indicator"></span> Banana Leaf Sadhya
+            </button>
+            <button type="button" class="hero-slider-dot" data-slide="3">
+              <span class="dot-indicator"></span> Grand Buffet & Live Counters
+            </button>
           </div>
 
           <div class="hero-stats">
@@ -152,10 +194,10 @@
       <div class="row align-items-center g-5">
         <div class="col-lg-6">
           <div class="story-image-wrap">
-            <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?q=80&w=1000&auto=format&fit=crop" alt="Libin Catering culinary excellence" class="story-main-img">
+            <img src="assets/images/south-indian-feast.jpg" alt="Kerala Sadhya, Nool Parotta, Idiyappam & Chicken Fry - Libin Catering" class="story-main-img" loading="lazy">
             <div class="story-floating-badge">
-              <h4 class="font-serif mb-1 text-gold">Master Chefs</h4>
-              <p class="mb-0 small text-white">Authentic Wood-Fired & Dum Recipes</p>
+              <h4 class="font-serif mb-1 text-gold">Authentic Recipes</h4>
+              <p class="mb-0 small text-white">Sadhya • Nool Parotta • Idiyappam • Chicken Fry</p>
             </div>
           </div>
         </div>
@@ -211,11 +253,11 @@
         <!-- Service 1 -->
         <div class="col-md-6 col-lg-4">
           <div class="service-card">
-            <img src="https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=800&auto=format&fit=crop" alt="Wedding Catering" class="service-card-img" loading="lazy">
+            <img src="assets/images/hero-slide-1.jpg" alt="Wedding Catering" class="service-card-img" loading="lazy">
             <div class="service-card-overlay">
               <div class="service-icon-wrap"><i class="bi bi-heart-fill"></i></div>
               <h3 class="service-title font-serif">Wedding Catering</h3>
-              <p class="service-desc">Grand multi-cuisine buffets, royal dum biryanis, and traditional banana leaf wedding feasts tailored for your special day.</p>
+              <p class="service-desc">Grand multi-cuisine buffets, wood-fired dum biryanis, and traditional banana leaf wedding feasts tailored for your special day.</p>
               <a href="contact.html?service=Wedding%20Catering#enquiry-form" class="service-link">Plan Wedding Feast <i class="bi bi-arrow-right"></i></a>
             </div>
           </div>
@@ -224,7 +266,7 @@
         <!-- Service 2 -->
         <div class="col-md-6 col-lg-4">
           <div class="service-card">
-            <img src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=800&auto=format&fit=crop" alt="Event Catering" class="service-card-img" loading="lazy">
+            <img src="assets/images/hero-slide-2.jpg" alt="Event Catering" class="service-card-img" loading="lazy">
             <div class="service-card-overlay">
               <div class="service-icon-wrap"><i class="bi bi-calendar-heart"></i></div>
               <h3 class="service-title font-serif">Event Catering</h3>
@@ -250,7 +292,7 @@
         <!-- Service 4 -->
         <div class="col-md-6 col-lg-4">
           <div class="service-card">
-            <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?q=80&w=800&auto=format&fit=crop" alt="Catering Staff" class="service-card-img" loading="lazy">
+            <img src="assets/images/hero-slide-4.jpg" alt="Catering Staff" class="service-card-img" loading="lazy">
             <div class="service-card-overlay">
               <div class="service-icon-wrap"><i class="bi bi-people-fill"></i></div>
               <h3 class="service-title font-serif">Professional Catering Staff</h3>
@@ -276,7 +318,7 @@
         <!-- Service 6 -->
         <div class="col-md-6 col-lg-4">
           <div class="service-card">
-            <img src="https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?q=80&w=800&auto=format&fit=crop" alt="Custom Events" class="service-card-img" loading="lazy">
+            <img src="assets/images/hero-slide-3.jpg" alt="Custom Events" class="service-card-img" loading="lazy">
             <div class="service-card-overlay">
               <div class="service-icon-wrap"><i class="bi bi-stars"></i></div>
               <h3 class="service-title font-serif">Custom Events & Live Counters</h3>
@@ -412,69 +454,189 @@
   </section>
 
   <!-- =========================================================================
-       9. Testimonials
+       9. Google Reviews & Testimonials
        ========================================================================= -->
-  <section class="section-padding bg-charcoal text-white">
+  <section class="section-padding bg-charcoal text-white position-relative" id="reviewsSection">
     <div class="container">
-      <div class="section-header text-center">
-        <span class="section-subtitle">Heartfelt Reviews</span>
-        <h2 class="section-title font-serif text-white">Words From Our Cherished Guests</h2>
-        <p class="section-desc text-white-50">Nothing delights us more than knowing we created unforgettable memories for families.</p>
+      <div class="section-header text-center mb-4">
+        <span class="section-subtitle">Client Endorsements</span>
+        <h2 class="section-title font-serif text-white">Google Reviews & Testimonials</h2>
+        <p class="section-desc text-white-50">Authentic experiences and reviews shared by our cherished clients across Tamil Nadu.</p>
       </div>
 
+      <!-- Google Reviews Aggregate Score Banner -->
+      <div class="google-reviews-banner">
+        <div class="row align-items-center g-4">
+          <div class="col-lg-7">
+            <div class="d-flex flex-wrap align-items-center gap-3">
+              <div class="google-brand-logo">
+                <svg width="24" height="24" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+              </div>
+              <div>
+                <div class="d-flex align-items-baseline gap-2">
+                  <span class="google-score-num" data-bind="google-rating">4.9</span>
+                  <div class="google-score-stars">★★★★★</div>
+                </div>
+                <div class="small text-white-50">
+                  <strong class="text-white">EXCELLENT</strong> &bull; Based on <strong class="text-gold" data-bind="google-review-count">150+</strong> Verified Google Reviews
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-5 text-lg-end">
+            <div class="d-flex flex-wrap justify-content-lg-end gap-2">
+              <a href="https://www.google.com/maps/place/Libin+Catering+Services/@8.3078817,77.1311018,17z/data=!4m8!3m7!1s0x3b05ab04435abe27:0x12a4c587ff77f9e!8m2!3d8.3078817!4d77.1311018!9m1!1b1!16s%2Fg%2F11j7dyx0g3" target="_blank" rel="noopener noreferrer" class="btn btn-gold btn-sm" data-bind="google-reviews-href">
+                <i class="bi bi-pencil-square me-1"></i> Review Us on Google
+              </a>
+              <a href="https://www.google.com/maps/place/Libin+Catering+Services/@8.3078817,77.1311018,17z/data=!4m8!3m7!1s0x3b05ab04435abe27:0x12a4c587ff77f9e!8m2!3d8.3078817!4d77.1311018!9m1!1b1!16s%2Fg%2F11j7dyx0g3" target="_blank" rel="noopener noreferrer" class="google-review-pill" data-bind="google-reviews-href">
+                <i class="bi bi-google"></i> Read All Reviews
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Google Review Cards Grid -->
       <div class="row g-4">
-        <!-- Testimonial 1 -->
+        <!-- Review 1 -->
         <div class="col-lg-4 col-md-6">
           <div class="testimonial-card">
-            <div class="testimonial-stars">
-              <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+            <div class="testimonial-card-header">
+              <div class="testimonial-stars">★★★★★</div>
+              <div class="google-verified-icon" title="Google Verified Review">
+                <svg width="14" height="14" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+              </div>
             </div>
             <p class="testimonial-quote">
-              "Libin Catering catered my daughter's wedding with over 1,200 guests in Nagercoil. The Mutton Biryani and Elaneer Payasam were talk of the town! Impeccable service."
+              "Libin Catering catered my daughter's wedding banquet with over 1,200 guests. The aromatic Mutton Dum Biryani, hot Parottas, and tender Elaneer Payasam were talk of the town! Impeccable hygiene and silver-standard service."
             </p>
             <div class="testimonial-author-wrap">
               <div class="testimonial-author-avatar">M</div>
               <div>
                 <div class="testimonial-author-name">Murugan & Family</div>
-                <div class="testimonial-author-event">Wedding Banquet (1,200 Guests)</div>
+                <div class="testimonial-author-event">
+                  <i class="bi bi-patch-check-fill text-gold"></i> Wedding Banquet (1,200 Guests)
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Testimonial 2 -->
+        <!-- Review 2 -->
         <div class="col-lg-4 col-md-6">
           <div class="testimonial-card">
-            <div class="testimonial-stars">
-              <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+            <div class="testimonial-card-header">
+              <div class="testimonial-stars">★★★★★</div>
+              <div class="google-verified-icon" title="Google Verified Review">
+                <svg width="14" height="14" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+              </div>
             </div>
             <p class="testimonial-quote">
-              "The 24-item traditional Banana Leaf Sadhya for our housewarming was authentic to the core. Hot, flavorful, and served with such gracious hospitality!"
+              "The 24-item traditional Banana Leaf Sadhya for our Grihapravesham was authentic to the core. Pure ghee avial, hot sambar, payasam—served with genuine warmth and punctuality. Best caterers in the region!"
             </p>
             <div class="testimonial-author-wrap">
               <div class="testimonial-author-avatar">R</div>
               <div>
                 <div class="testimonial-author-name">Rajesh Kumar</div>
-                <div class="testimonial-author-event">Housewarming Sadhya (350 Guests)</div>
+                <div class="testimonial-author-event">
+                  <i class="bi bi-patch-check-fill text-gold"></i> Housewarming Sadhya (350 Guests)
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Testimonial 3 -->
+        <!-- Review 3 -->
         <div class="col-lg-4 col-md-6">
           <div class="testimonial-card">
-            <div class="testimonial-stars">
-              <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+            <div class="testimonial-card-header">
+              <div class="testimonial-stars">★★★★★</div>
+              <div class="google-verified-icon" title="Google Verified Review">
+                <svg width="14" height="14" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+              </div>
             </div>
             <p class="testimonial-quote">
-              "Their team handled our corporate annual meet flawlessly. From stage lighting to live grill counters and hot parottas, everything was top-notch."
+              "Their team managed our corporate annual gala effortlessly. The live tandoor and grill counter, customized welcome mocktails, and courteous uniformed staff made a lasting impression on our executive delegates."
             </p>
             <div class="testimonial-author-wrap">
               <div class="testimonial-author-avatar">A</div>
               <div>
                 <div class="testimonial-author-name">Anand Vardhan</div>
-                <div class="testimonial-author-event">Corporate Annual Meet (450 Guests)</div>
+                <div class="testimonial-author-event">
+                  <i class="bi bi-patch-check-fill text-gold"></i> Corporate Annual Meet (450 Guests)
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Review 4 -->
+        <div class="col-lg-4 col-md-6">
+          <div class="testimonial-card">
+            <div class="testimonial-card-header">
+              <div class="testimonial-stars">★★★★★</div>
+              <div class="google-verified-icon" title="Google Verified Review">
+                <svg width="14" height="14" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+              </div>
+            </div>
+            <p class="testimonial-quote">
+              "We booked Libin Catering for our grand reception with 800 guests. The Chicken Dum Biryani, Paneer Butter Masala, and live dessert counters were fantastic. Total peace of mind for the family."
+            </p>
+            <div class="testimonial-author-wrap">
+              <div class="testimonial-author-avatar">P</div>
+              <div>
+                <div class="testimonial-author-name">Priya & Dinesh</div>
+                <div class="testimonial-author-event">
+                  <i class="bi bi-patch-check-fill text-gold"></i> Reception Feast (800 Guests)
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Review 5 -->
+        <div class="col-lg-4 col-md-6">
+          <div class="testimonial-card">
+            <div class="testimonial-card-header">
+              <div class="testimonial-stars">★★★★★</div>
+              <div class="google-verified-icon" title="Google Verified Review">
+                <svg width="14" height="14" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+              </div>
+            </div>
+            <p class="testimonial-quote">
+              "Outstanding taste and remarkable professionalism. All 500 guests praised the food quality. The team maintained clean serving counters from start to finish. Highly recommend!"
+            </p>
+            <div class="testimonial-author-wrap">
+              <div class="testimonial-author-avatar">S</div>
+              <div>
+                <div class="testimonial-author-name">Subhashree M.</div>
+                <div class="testimonial-author-event">
+                  <i class="bi bi-patch-check-fill text-gold"></i> Betrothal Ceremony (500 Guests)
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Review 6 -->
+        <div class="col-lg-4 col-md-6">
+          <div class="testimonial-card">
+            <div class="testimonial-card-header">
+              <div class="testimonial-stars">★★★★★</div>
+              <div class="google-verified-icon" title="Google Verified Review">
+                <svg width="14" height="14" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+              </div>
+            </div>
+            <p class="testimonial-quote">
+              "We celebrated our parent's 60th birthday with Libin Catering. Every single delicacy was fresh, piping hot, and full of authentic heritage flavours. Truly a 5-star experience!"
+            </p>
+            <div class="testimonial-author-wrap">
+              <div class="testimonial-author-avatar">K</div>
+              <div>
+                <div class="testimonial-author-name">Dr. K. Ramanathan</div>
+                <div class="testimonial-author-event">
+                  <i class="bi bi-patch-check-fill text-gold"></i> Family Milestone Feast (300 Guests)
+                </div>
               </div>
             </div>
           </div>

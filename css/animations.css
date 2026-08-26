@@ -106,55 +106,6 @@
   z-index: 1;
 }
 
-.hero-fog-layer {
-  position: absolute;
-  inset: 0;
-  width: 250%;
-  height: 100%;
-  pointer-events: none;
-  will-change: transform;
-}
-
-.fog-back {
-  background: radial-gradient(ellipse 65% 45% at 50% 100%, rgba(255, 140, 30, 0.12), transparent 70%),
-              radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.07) 0%, transparent 50%),
-              radial-gradient(circle at 65% 85%, rgba(255, 255, 255, 0.08) 0%, transparent 60%),
-              radial-gradient(circle at 85% 75%, rgba(255, 255, 255, 0.06) 0%, transparent 50%);
-  filter: blur(28px);
-  animation: fogDriftSlow 34s linear infinite alternate;
-  opacity: 0.85;
-}
-
-.fog-mid {
-  background: radial-gradient(circle at 35% 95%, rgba(255, 195, 60, 0.09) 0%, transparent 45%),
-              radial-gradient(circle at 75% 85%, rgba(255, 255, 255, 0.08) 0%, transparent 55%),
-              radial-gradient(circle at 50% 90%, rgba(240, 240, 245, 0.07) 0%, transparent 50%);
-  filter: blur(20px);
-  animation: fogDriftMedium 22s linear infinite;
-  opacity: 0.75;
-}
-
-.fog-front {
-  background: linear-gradient(to top, rgba(16, 17, 20, 0.8) 0%, rgba(20, 20, 24, 0.25) 25%, transparent 65%),
-              radial-gradient(circle at 45% 95%, rgba(255, 215, 100, 0.1) 0%, transparent 40%);
-  filter: blur(14px);
-  animation: fogDriftFast 16s ease-in-out infinite alternate;
-  opacity: 0.8;
-}
-
-.hero-fire-glow {
-  position: absolute;
-  bottom: -30px;
-  left: 0;
-  right: 0;
-  height: 260px;
-  background: radial-gradient(ellipse 70% 60% at 50% 100%, rgba(255, 110, 15, 0.24) 0%, rgba(212, 143, 24, 0.12) 40%, rgba(197, 155, 39, 0.04) 65%, transparent 100%);
-  mix-blend-mode: screen;
-  filter: blur(22px);
-  animation: fireGlowPulse 3.2s ease-in-out infinite alternate;
-  pointer-events: none;
-}
-
 .hero-atmosphere-canvas {
   position: absolute;
   inset: 0;
@@ -163,6 +114,7 @@
   pointer-events: none;
   z-index: 2;
   mix-blend-mode: screen;
+  will-change: transform;
 }
 
 .hero-fx-fallback {
@@ -173,26 +125,109 @@
   z-index: 1;
 }
 
-@keyframes fogDriftSlow {
+/* Fallback Multi-Layer Smoke & Flame */
+.hero-fog-layer {
+  position: absolute;
+  inset: 0;
+  width: 200%;
+  height: 100%;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+.fog-back {
+  background: radial-gradient(ellipse 75% 55% at 50% 100%, rgba(255, 120, 20, 0.10), transparent 75%),
+              radial-gradient(circle at 25% 75%, rgba(255, 200, 100, 0.07) 0%, transparent 45%),
+              radial-gradient(circle at 70% 80%, rgba(255, 160, 40, 0.08) 0%, transparent 55%),
+              radial-gradient(circle at 85% 65%, rgba(240, 230, 220, 0.05) 0%, transparent 50%);
+  filter: blur(32px);
+  animation: fireSmokeDriftSlow 28s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
+  opacity: 0.75;
+}
+
+.fog-mid {
+  background: radial-gradient(circle at 45% 92%, rgba(255, 175, 45, 0.09) 0%, transparent 45%),
+              radial-gradient(circle at 75% 82%, rgba(255, 110, 20, 0.07) 0%, transparent 50%),
+              radial-gradient(circle at 30% 85%, rgba(220, 210, 200, 0.05) 0%, transparent 45%);
+  filter: blur(22px);
+  animation: fireSmokeDriftMedium 18s ease-in-out infinite alternate;
+  opacity: 0.7;
+}
+
+.fog-front {
+  background: linear-gradient(to top, rgba(16, 17, 20, 0.85) 0%, rgba(255, 140, 30, 0.04) 25%, transparent 60%),
+              radial-gradient(circle at 50% 96%, rgba(255, 225, 130, 0.12) 0%, transparent 35%);
+  filter: blur(14px);
+  animation: fireSmokeDriftFast 12s ease-in-out infinite alternate;
+  opacity: 0.75;
+}
+
+.hero-fire-glow {
+  position: absolute;
+  bottom: -40px;
+  left: 0;
+  right: 0;
+  height: 260px;
+  background: radial-gradient(ellipse 65% 55% at 50% 100%, 
+                rgba(255, 90, 15, 0.20) 0%, 
+                rgba(255, 175, 35, 0.12) 35%, 
+                rgba(220, 140, 20, 0.04) 60%, 
+                transparent 85%);
+  mix-blend-mode: screen;
+  filter: blur(24px);
+  animation: fireGlowPulse 3.2s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+/* Culinary Flame Ember & Smoke Badges */
+.flame-smoke-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 90, 10, 0.12);
+  border: 1px solid rgba(255, 140, 30, 0.35);
+  color: #ffaa33;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.flame-smoke-badge i {
+  color: #ff5511;
+  animation: flameFlicker 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes fireSmokeDriftSlow {
   0% { transform: translate3d(0, 0, 0) scale(1); }
-  50% { transform: translate3d(-15%, -2%, 0) scale(1.04); }
-  100% { transform: translate3d(-28%, 1%, 0) scale(1); }
+  50% { transform: translate3d(-12%, -3%, 0) scale(1.06); }
+  100% { transform: translate3d(-24%, 2%, 0) scale(1.02); }
 }
 
-@keyframes fogDriftMedium {
-  0% { transform: translate3d(-20%, 0, 0); }
-  100% { transform: translate3d(0%, 0, 0); }
+@keyframes fireSmokeDriftMedium {
+  0% { transform: translate3d(-15%, 2%, 0) scale(1.02); }
+  50% { transform: translate3d(0%, -2%, 0) scale(0.98); }
+  100% { transform: translate3d(-8%, 1%, 0) scale(1.04); }
 }
 
-@keyframes fogDriftFast {
+@keyframes fireSmokeDriftFast {
   0% { transform: translate3d(0, 1%, 0); }
-  100% { transform: translate3d(-16%, -2%, 0); }
+  50% { transform: translate3d(-10%, -2%, 0); }
+  100% { transform: translate3d(-18%, 1%, 0); }
 }
 
 @keyframes fireGlowPulse {
-  0% { opacity: 0.7; transform: scaleY(0.94) translateY(4px); }
-  50% { opacity: 0.98; transform: scaleY(1.08) translateY(-4px); }
-  100% { opacity: 0.75; transform: scaleY(0.96) translateY(2px); }
+  0% { opacity: 0.65; transform: scaleY(0.92) translateY(6px); }
+  50% { opacity: 1.0; transform: scaleY(1.12) translateY(-6px); }
+  100% { opacity: 0.72; transform: scaleY(0.96) translateY(3px); }
+}
+
+@keyframes flameFlicker {
+  0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.9; }
+  25% { transform: scale(1.12) rotate(-3deg); opacity: 1; }
+  75% { transform: scale(0.92) rotate(3deg); opacity: 0.82; }
 }
 
 /* Accessibility: Respect Reduced Motion */
@@ -206,7 +241,8 @@
     scroll-behavior: auto !important;
   }
   .hero-fog-layer,
-  .hero-fire-glow {
+  .hero-fire-glow,
+  .flame-smoke-badge i {
     animation: none !important;
   }
 }

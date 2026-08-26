@@ -15,8 +15,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       document.getElementById('secondaryPhone').value = info.secondary_phone || info.secondaryPhone || '+91 9442779796';
       document.getElementById('whatsappNumber').value = info.whatsapp_number || info.whatsapp || '+91 9442779796';
       document.getElementById('businessEmail').value = info.email || 'libincateringservice@gmail.com';
-      document.getElementById('businessAddress').value = info.address || 'Libin Catering Service, Main Road, Tamil Nadu, India';
-      document.getElementById('mapEmbedUrl').value = info.map_embed_url || info.mapEmbedUrl || '';
+      document.getElementById('businessAddress').value = info.address || 'Libin Catering Services, Tamil Nadu, India';
+      document.getElementById('mapEmbedUrl').value = info.map_embed_url || info.mapEmbedUrl || 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3948.3304938096355!2d77.1285269!3d8.3078817!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b05ab04435abe27%3A0x12a4c587ff77f9e!2sLibin%20Catering%20Services!5e0!3m2!1sen!2sin!4v1708850000000!5m2!1sen!2sin';
       document.getElementById('openingHours').value = info.opening_hours || info.openingHours || 'Mon - Sun: 7:00 AM - 10:30 PM (24/7 Event Booking)';
       
       if (info.social) {

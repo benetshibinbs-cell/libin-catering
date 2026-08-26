@@ -18,9 +18,17 @@ window.APP_CONFIG = {
     whatsapp: '+91 9442779796',
     whatsappFormatted: '919442779796',
     email: 'libincateringservice@gmail.com',
-    address: 'Libin Catering Service & Event Management, Tamil Nadu, India',
+    address: 'Libin Catering Services, Tamil Nadu, India',
     openingHours: 'Monday - Sunday: 7:00 AM - 10:30 PM (24/7 Event Inquiries)',
-    mapEmbedUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d126353.47352378964!2d77.3486121404179!3d8.18873994326127!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b04f128c7c98863%3A0xc078107c1fa77ea6!2sNagercoil%2C%20Tamil%20Nadu!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin',
+    location: {
+      latitude: 8.3078817,
+      longitude: 77.1311018
+    },
+    googleRating: '4.9',
+    googleReviewCount: '150+',
+    googleMapsUrl: 'https://www.google.com/maps/place/Libin+Catering+Services/@8.3078817,77.1311018,17z/data=!3m1!4b1!4m6!3m5!1s0x3b05ab04435abe27:0x12a4c587ff77f9e!8m2!3d8.3078817!4d77.1311018!16s%2Fg%2F11j7dyx0g3',
+    googleReviewsUrl: 'https://www.google.com/maps/place/Libin+Catering+Services/@8.3078817,77.1311018,17z/data=!4m8!3m7!1s0x3b05ab04435abe27:0x12a4c587ff77f9e!8m2!3d8.3078817!4d77.1311018!9m1!1b1!16s%2Fg%2F11j7dyx0g3',
+    mapEmbedUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3948.3304938096355!2d77.1285269!3d8.3078817!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b05ab04435abe27%3A0x12a4c587ff77f9e!2sLibin%20Catering%20Services!5e0!3m2!1sen!2sin!4v1708850000000!5m2!1sen!2sin',
     social: {
       facebook: 'https://facebook.com',
       instagram: 'https://instagram.com',

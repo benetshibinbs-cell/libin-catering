@@ -15,78 +15,83 @@ ALTER TABLE public.site_settings ENABLE ROW LEVEL SECURITY;
 -- =============================================================================
 -- 2. POLICIES: CATEGORIES
 -- =============================================================================
--- Public: Read active categories
-CREATE POLICY "Public can view active categories"
+DROP POLICY IF EXISTS "Public can view active categories" ON public.categories;
+DROP POLICY IF EXISTS "Authenticated users can manage all categories" ON public.categories;
+DROP POLICY IF EXISTS "Allow reading categories" ON public.categories;
+DROP POLICY IF EXISTS "Allow managing categories" ON public.categories;
+
+CREATE POLICY "Allow reading categories"
 ON public.categories
 FOR SELECT
 TO anon, authenticated
-USING (is_active = true);
+USING (true);
 
--- Authenticated (Admin): Full Access
-CREATE POLICY "Authenticated users can manage all categories"
+CREATE POLICY "Allow managing categories"
 ON public.categories
 FOR ALL
-TO authenticated
+TO anon, authenticated
 USING (true)
 WITH CHECK (true);
 
 -- =============================================================================
 -- 3. POLICIES: MENU ITEMS
 -- =============================================================================
--- Public: Read available menu items
-CREATE POLICY "Public can view available menu items"
+DROP POLICY IF EXISTS "Public can view available menu items" ON public.menu_items;
+DROP POLICY IF EXISTS "Authenticated users can manage all menu items" ON public.menu_items;
+DROP POLICY IF EXISTS "Allow reading menu items" ON public.menu_items;
+DROP POLICY IF EXISTS "Allow managing menu items" ON public.menu_items;
+
+CREATE POLICY "Allow reading menu items"
 ON public.menu_items
 FOR SELECT
 TO anon, authenticated
-USING (is_available = true);
+USING (true);
 
--- Authenticated (Admin): Full Access
-CREATE POLICY "Authenticated users can manage all menu items"
+CREATE POLICY "Allow managing menu items"
 ON public.menu_items
 FOR ALL
-TO authenticated
+TO anon, authenticated
 USING (true)
 WITH CHECK (true);
 
 -- =============================================================================
 -- 4. POLICIES: EVENTS
 -- =============================================================================
--- Public: Read published events
-CREATE POLICY "Public can view published events"
+DROP POLICY IF EXISTS "Public can view published events" ON public.events;
+DROP POLICY IF EXISTS "Authenticated users can manage all events" ON public.events;
+DROP POLICY IF EXISTS "Allow reading events" ON public.events;
+DROP POLICY IF EXISTS "Allow managing events" ON public.events;
+
+CREATE POLICY "Allow reading events"
 ON public.events
 FOR SELECT
 TO anon, authenticated
-USING (is_published = true);
+USING (true);
 
--- Authenticated (Admin): Full Access
-CREATE POLICY "Authenticated users can manage all events"
+CREATE POLICY "Allow managing events"
 ON public.events
 FOR ALL
-TO authenticated
+TO anon, authenticated
 USING (true)
 WITH CHECK (true);
 
 -- =============================================================================
 -- 5. POLICIES: ENQUIRIES
 -- =============================================================================
--- Public: Can submit new enquiries
-CREATE POLICY "Public can submit enquiries"
-ON public.enquiries
-FOR INSERT
-TO anon, authenticated
-WITH CHECK (
-    LENGTH(TRIM(name)) > 0 AND 
-    LENGTH(TRIM(phone)) >= 8 AND
-    event_date IS NOT NULL
-);
-
--- Enquiries Access: View, Update, and Manage Enquiries
+DROP POLICY IF EXISTS "Public can submit enquiries" ON public.enquiries;
 DROP POLICY IF EXISTS "Authenticated users can view enquiries" ON public.enquiries;
 DROP POLICY IF EXISTS "Authenticated users can update enquiries" ON public.enquiries;
 DROP POLICY IF EXISTS "Authenticated users can delete enquiries" ON public.enquiries;
 DROP POLICY IF EXISTS "Allow reading enquiries" ON public.enquiries;
+DROP POLICY IF EXISTS "Allow inserting enquiries" ON public.enquiries;
 DROP POLICY IF EXISTS "Allow updating enquiries" ON public.enquiries;
 DROP POLICY IF EXISTS "Allow deleting enquiries" ON public.enquiries;
+
+CREATE POLICY "Allow inserting enquiries"
+ON public.enquiries
+FOR INSERT
+TO anon, authenticated
+WITH CHECK (true);
 
 CREATE POLICY "Allow reading enquiries"
 ON public.enquiries
@@ -110,88 +115,108 @@ USING (true);
 -- =============================================================================
 -- 6. POLICIES: GALLERY
 -- =============================================================================
--- Public: Read published gallery items
-CREATE POLICY "Public can view published gallery"
+DROP POLICY IF EXISTS "Public can view published gallery" ON public.gallery;
+DROP POLICY IF EXISTS "Authenticated users can manage gallery" ON public.gallery;
+DROP POLICY IF EXISTS "Allow reading gallery" ON public.gallery;
+DROP POLICY IF EXISTS "Allow managing gallery" ON public.gallery;
+
+CREATE POLICY "Allow reading gallery"
 ON public.gallery
 FOR SELECT
 TO anon, authenticated
-USING (is_published = true);
+USING (true);
 
--- Authenticated (Admin): Full Access
-CREATE POLICY "Authenticated users can manage gallery"
+CREATE POLICY "Allow managing gallery"
 ON public.gallery
 FOR ALL
-TO authenticated
+TO anon, authenticated
 USING (true)
 WITH CHECK (true);
 
 -- =============================================================================
 -- 7. POLICIES: CONTACT INFORMATION
 -- =============================================================================
--- Public: Read contact information
-CREATE POLICY "Public can view contact information"
+DROP POLICY IF EXISTS "Public can view contact information" ON public.contact_information;
+DROP POLICY IF EXISTS "Authenticated users can manage contact information" ON public.contact_information;
+DROP POLICY IF EXISTS "Allow reading contact information" ON public.contact_information;
+DROP POLICY IF EXISTS "Allow managing contact information" ON public.contact_information;
+
+CREATE POLICY "Allow reading contact information"
 ON public.contact_information
 FOR SELECT
 TO anon, authenticated
 USING (true);
 
--- Authenticated (Admin): Full Access
-CREATE POLICY "Authenticated users can manage contact information"
+CREATE POLICY "Allow managing contact information"
 ON public.contact_information
 FOR ALL
-TO authenticated
+TO anon, authenticated
 USING (true)
 WITH CHECK (true);
 
 -- =============================================================================
 -- 8. POLICIES: SITE SETTINGS
 -- =============================================================================
--- Public: Read settings
-CREATE POLICY "Public can view site settings"
+DROP POLICY IF EXISTS "Public can view site settings" ON public.site_settings;
+DROP POLICY IF EXISTS "Authenticated users can manage site settings" ON public.site_settings;
+DROP POLICY IF EXISTS "Allow reading site settings" ON public.site_settings;
+DROP POLICY IF EXISTS "Allow managing site settings" ON public.site_settings;
+
+CREATE POLICY "Allow reading site settings"
 ON public.site_settings
 FOR SELECT
 TO anon, authenticated
 USING (true);
 
--- Authenticated (Admin): Full Access
-CREATE POLICY "Authenticated users can manage site settings"
+CREATE POLICY "Allow managing site settings"
 ON public.site_settings
 FOR ALL
-TO authenticated
+TO anon, authenticated
 USING (true)
 WITH CHECK (true);
 
 -- =============================================================================
 -- 9. STORAGE BUCKET POLICIES (Supabase Storage: 'media' bucket)
 -- =============================================================================
--- Create bucket if not exists (Note: Run in Supabase SQL Editor if storage is active)
+-- Create bucket if not exists
 INSERT INTO storage.buckets (id, name, public) 
 VALUES ('media', 'media', true)
 ON CONFLICT (id) DO NOTHING;
 
--- Public: Read media objects
+-- Drop existing policies if any to prevent duplicate policy errors
+DROP POLICY IF EXISTS "Public media access" ON storage.objects;
+DROP POLICY IF EXISTS "Authenticated media upload" ON storage.objects;
+DROP POLICY IF EXISTS "Authenticated media update" ON storage.objects;
+DROP POLICY IF EXISTS "Authenticated media delete" ON storage.objects;
+DROP POLICY IF EXISTS "Media bucket upload access" ON storage.objects;
+DROP POLICY IF EXISTS "Media bucket update access" ON storage.objects;
+DROP POLICY IF EXISTS "Media bucket delete access" ON storage.objects;
+
+-- 1. Public: Read media objects
 CREATE POLICY "Public media access"
 ON storage.objects
 FOR SELECT
 TO anon, authenticated
 USING (bucket_id = 'media');
 
--- Authenticated: Upload/Manage media objects
-CREATE POLICY "Authenticated media upload"
+-- 2. Upload media objects (Anon & Authenticated for web admin dashboard)
+CREATE POLICY "Media bucket upload access"
 ON storage.objects
 FOR INSERT
-TO authenticated
+TO anon, authenticated
 WITH CHECK (bucket_id = 'media');
 
-CREATE POLICY "Authenticated media update"
+-- 3. Update media objects
+CREATE POLICY "Media bucket update access"
 ON storage.objects
 FOR UPDATE
-TO authenticated
+TO anon, authenticated
 USING (bucket_id = 'media')
 WITH CHECK (bucket_id = 'media');
 
-CREATE POLICY "Authenticated media delete"
+-- 4. Delete media objects
+CREATE POLICY "Media bucket delete access"
 ON storage.objects
 FOR DELETE
-TO authenticated
+TO anon, authenticated
 USING (bucket_id = 'media');

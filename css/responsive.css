@@ -193,6 +193,16 @@
   .table-responsive {
     border-radius: var(--radius-sm);
   }
+
+  .hero-slider-nav {
+    margin-top: 1.5rem;
+    gap: 0.5rem;
+  }
+
+  .hero-slider-dot {
+    font-size: 0.725rem;
+    padding: 0.3rem 0.75rem;
+  }
 }
 
 /* Small Phones (375px to 425px) */

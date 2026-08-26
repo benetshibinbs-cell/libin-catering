@@ -185,10 +185,19 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       const client = window.DB.getClient();
       if (client) {
+        let res;
         if (id) {
-          await client.from('menu_items').update(payload).eq('id', id);
+          res = await client.from('menu_items').update(payload).eq('id', id);
         } else {
-          await client.from('menu_items').insert([payload]);
+          res = await client.from('menu_items').insert([payload]);
+        }
+
+        if (res && res.error) {
+          console.error('Supabase menu save error:', res.error);
+          if (window.showToast) window.showToast('Database Error: ' + res.error.message, 'danger');
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = originalText;
+          return;
         }
       } else {
         // Fallback local update
@@ -201,6 +210,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
       }
 
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = originalText;
       if (window.showToast) window.showToast('Menu item saved successfully!');
       if (menuModal) menuModal.hide();
       await loadTable();
@@ -212,7 +223,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!confirm('Are you sure you want to delete this menu item?')) return;
     const client = window.DB.getClient();
     if (client) {
-      await client.from('menu_items').delete().eq('id', id);
+      const res = await client.from('menu_items').delete().eq('id', id);
+      if (res && res.error) {
+        console.error('Supabase delete error:', res.error);
+        if (window.showToast) window.showToast('Database Error: ' + res.error.message, 'danger');
+        return;
+      }
     } else {
       menuItems = menuItems.filter(i => i.id !== id);
     }

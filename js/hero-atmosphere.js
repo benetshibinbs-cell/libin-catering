@@ -1,23 +1,21 @@
 /**
  * LIBIN CATERING SERVICE & EVENT MANAGEMENT
- * Cinematic Hero Atmosphere Engine (WebGL / Three.js + GLSL Procedural Shaders)
+ * Light Cinematic Fire & Smoke Atmosphere Engine (Particles Removed)
  * 
  * Features:
- * - Multi-octave GLSL Fractional Brownian Motion (FBM) Volumetric Smoke/Fog
- * - Organic Warm Firelight Bloom & Subtle Flame Harmonics
- * - Floating Glowing Ember Particles with Additive Blending
- * - Mouse-Responsive Parallax Depth & Mobile Touch Adaptation
- * - Automatic Performance Throttle (IntersectionObserver & PixelRatio Clamping)
- * - Pure CSS Graceful Degradation Fallback
+ * - Light & Soft Procedural Fire Flame Simulation (Domain-Warped GLSL Simplex FBM)
+ * - Gentle Volumetric Wispy Smoke with Warm Culinary Firelight
+ * - Clean & Elegant: Ember/Spark Particles Removed for a Minimal Luxury Aesthetic
+ * - Interactive Subtle Wind Wake (Mouse & Touch Drag Deflection)
+ * - Ultra Smooth 60 FPS GPU Shader with 2D Canvas Fallback
+ * - Responsive Resolution Clamping & IntersectionObserver Battery Preservation
  */
 
 (function () {
   'use strict';
 
-  // Check reduced motion preference
   const prefersReducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  // Check WebGL availability
   function isWebGLSupported() {
     try {
       const testCanvas = document.createElement('canvas');
@@ -34,10 +32,15 @@
 
     if (!container || !canvas) return;
 
-    // If WebGL is not supported, Three.js is not loaded, or reduced motion is active -> Activate CSS Fallback
-    if (!isWebGLSupported() || typeof THREE === 'undefined' || prefersReducedMotion) {
+    if (prefersReducedMotion) {
       if (fallbackEl) fallbackEl.style.display = 'block';
       if (canvas) canvas.style.display = 'none';
+      return;
+    }
+
+    // Check if Three.js is available & WebGL is supported
+    if (!isWebGLSupported() || typeof THREE === 'undefined') {
+      initCanvas2DFallback(canvas, container);
       return;
     }
 
@@ -47,7 +50,7 @@
       let height = heroSection.clientHeight || window.innerHeight;
 
       // -----------------------------------------------------------------------
-      // 1. Scene, Camera, and High-Performance Renderer
+      // 1. Scene, Orthographic Camera, and High-Performance Renderer
       // -----------------------------------------------------------------------
       const scene = new THREE.Scene();
       const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 10);
@@ -66,9 +69,9 @@
       renderer.setClearColor(0x000000, 0);
 
       // -----------------------------------------------------------------------
-      // 2. GLSL Procedural Fog & Organic Firelight Bloom Shader
+      // 2. Light Procedural Fire & Gentle Wispy Smoke GLSL Shader
       // -----------------------------------------------------------------------
-      const fogVertexShader = `
+      const fireSmokeVertexShader = `
         varying vec2 vUv;
         void main() {
           vUv = uv;
@@ -76,15 +79,16 @@
         }
       `;
 
-      const fogFragmentShader = `
+      const fireSmokeFragmentShader = `
         precision highp float;
         varying vec2 vUv;
         
         uniform float uTime;
         uniform vec2 uResolution;
         uniform vec2 uMouse;
+        uniform vec2 uWind;
 
-        // 2D Hash & Simplex-style Noise
+        // 2D Hash & Fast Simplex-style Noise
         vec2 hash2(vec2 p) {
           p = vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)));
           return -1.0 + 2.0 * fract(sin(p) * 43758.5453123);
@@ -102,225 +106,200 @@
                 dot(hash2(i + vec2(1.0, 1.0)), f - vec2(1.0, 1.0)), u.x), u.y);
         }
 
-        // Fractional Brownian Motion (4 octaves for rich volumetric smoke)
+        // Multi-octave Fractional Brownian Motion (Light Smoke & Flame turbulence)
         float fbm(vec2 p) {
-          float value = 0.0;
-          float amp = 0.52;
+          float v = 0.0;
+          float amp = 0.5;
           float freq = 1.0;
           for (int i = 0; i < 4; i++) {
-            value += amp * noise(p * freq);
-            freq *= 2.12;
+            v += amp * noise(p * freq);
+            freq *= 2.1;
             amp *= 0.48;
           }
-          return value;
+          return v;
+        }
+
+        // Domain-warping for soft, organic smoke eddies
+        float domainWarpFbm(vec2 p, float time) {
+          vec2 q = vec2(
+            fbm(p + vec2(0.0, -time * 0.3)),
+            fbm(p + vec2(4.2, 1.1 - time * 0.25))
+          );
+
+          vec2 r = vec2(
+            fbm(p + 2.8 * q + vec2(1.4 - time * 0.35, 7.2)),
+            fbm(p + 2.8 * q + vec2(6.3, 2.2 - time * 0.4))
+          );
+
+          return fbm(p + 3.0 * r);
         }
 
         void main() {
           vec2 uv = vUv;
           float aspect = uResolution.x / uResolution.y;
-          vec2 st = uv * vec2(aspect, 1.0);
+          vec2 st = vec2(uv.x * aspect, uv.y);
 
-          // Subtle interactive parallax offset
-          vec2 mouseOffset = (uMouse - 0.5) * 0.08;
+          // Subtle interactive mouse wind deflection
+          vec2 mouseOffset = (uMouse - vec2(0.5, 0.3)) * 0.12;
+          vec2 windOffset = uWind * 0.1;
+          vec2 totalOffset = mouseOffset + windOffset;
 
-          // Slow organic smoke motion (drift right + convective billow up)
-          float t = uTime * 0.07;
-          vec2 smokeUv1 = st * 1.35 + vec2(-t * 0.45, -t * 0.25) + mouseOffset * 0.5;
-          vec2 smokeUv2 = st * 2.2 + vec2(t * 0.32, -t * 0.4) - mouseOffset * 0.8;
+          float t = uTime;
 
-          // Multi-layer turbulence
-          float n1 = fbm(smokeUv1);
-          float n2 = fbm(smokeUv2 + n1 * 0.65);
-          float combinedSmoke = smoothstep(-0.25, 0.65, n2);
-
-          // Height gradient: denser near bottom, dissipating gently toward the top
-          float heightGradient = smoothstep(1.05, 0.0, uv.y);
-          float smokeDensity = combinedSmoke * heightGradient * 0.38;
-
-          // -------------------------------------------------------------------
-          // Organic Firelight Glow / Hearth Bloom
-          // -------------------------------------------------------------------
-          // Positioned at bottom center-left, shifting subtly with mouse
-          vec2 fireCenter = vec2(0.48 + mouseOffset.x * 0.4, 0.02 + mouseOffset.y * 0.2);
-          float fireDist = length((uv - fireCenter) * vec2(aspect * 0.85, 1.3));
+          // ===================================================================
+          // 1. LIGHT & SOFT CULINARY FIRE FLAMES (Base Warmth)
+          // ===================================================================
+          vec2 fireBaseSt = vec2(st.x - (0.5 * aspect + totalOffset.x * 0.5), st.y - 0.0);
           
-          // Organic compound sine wave harmonics for warm flame breathing
-          float firePulse = sin(uTime * 1.1) * 0.08 + 
-                            sin(uTime * 2.4 + 1.2) * 0.05 + 
-                            sin(uTime * 0.45) * 0.12;
+          // Gentle upward convection
+          vec2 flameCoord = vec2(fireBaseSt.x * 2.2, fireBaseSt.y * 3.0);
+          float flameTime = t * 1.6;
 
-          float fireGlow = exp(-fireDist * (2.8 - firePulse * 0.6)) * (0.85 + firePulse);
-          fireGlow = clamp(fireGlow, 0.0, 1.0);
+          // Soft flame domain-warping
+          float flameWarp1 = fbm(flameCoord * 1.5 + vec2(totalOffset.x * 1.2, -flameTime * 1.1));
+          float flameWarp2 = fbm(flameCoord * 2.6 + vec2(-flameWarp1 * 1.4, -flameTime * 1.6));
+          
+          vec2 warpedFlameUv = flameCoord + vec2(flameWarp1 * 0.45, flameWarp2 * 0.6);
+          float flameNoise = fbm(warpedFlameUv + vec2(0.0, -flameTime * 0.9));
 
-          // Luxury Palette
-          // Deep noir smoke
-          vec3 smokeColor = vec3(0.07, 0.075, 0.09);
-          // Rich amber/gold flame glow
-          vec3 flameAmber = vec3(1.0, 0.48, 0.12);
-          vec3 flameGold = vec3(0.85, 0.68, 0.22);
-          vec3 fireLight = mix(flameAmber, flameGold, smoothstep(0.0, 0.7, fireGlow));
+          // Base flame parabolic mask (gentle tapering width)
+          float flameWidth = 1.1 + 0.12 * sin(t * 1.4);
+          float flameShape = 1.0 - (fireBaseSt.x * fireBaseSt.x) / (flameWidth * flameWidth);
+          flameShape = clamp(flameShape, 0.0, 1.0);
 
-          // Composite lighting on smoke
-          vec3 finalColor = smokeColor * smokeDensity + fireLight * (fireGlow * 0.42);
-          float finalAlpha = clamp(smokeDensity * 0.75 + fireGlow * 0.38, 0.0, 0.72);
+          // Soft height envelope: gentle, warm, lower-third presence
+          float flameHeight = 0.38 + 0.08 * sin(t * 2.0 + flameWarp1 * 1.5);
+          float flameVerticalFade = smoothstep(flameHeight, 0.01, uv.y);
+
+          // Light flame intensity (soft & ethereal, not harsh)
+          float flameIntensity = (flameNoise * 0.55 + 0.45) * flameShape * flameVerticalFade;
+          flameIntensity = pow(flameIntensity, 1.5) * 1.1;
+          flameIntensity = clamp(flameIntensity, 0.0, 0.85);
+
+          // Soft Culinary Flame Heat Palette (Elegantly Balanced)
+          vec3 coreWhiteGold = vec3(1.0, 0.96, 0.88);   // Soft incandescent warm white
+          vec3 warmSaffron = vec3(1.0, 0.75, 0.22);     // Saffron gold
+          vec3 softAmber = vec3(1.0, 0.45, 0.10);       // Gentle amber
+          vec3 gentleRed = vec3(0.70, 0.12, 0.04);      // Soft ruby rim
+
+          vec3 flameColor = gentleRed;
+          flameColor = mix(flameColor, softAmber, smoothstep(0.12, 0.38, flameIntensity));
+          flameColor = mix(flameColor, warmSaffron, smoothstep(0.38, 0.68, flameIntensity));
+          flameColor = mix(flameColor, coreWhiteGold, smoothstep(0.68, 0.95, flameIntensity));
+
+          // Gentle ambient hearth fire bloom glow
+          float hearthDist = length(vec2((uv.x - 0.5) * aspect * 0.85, (uv.y - 0.02) * 1.6));
+          float hearthPulse = 0.88 + 0.12 * sin(t * 1.8) + 0.05 * cos(t * 3.2);
+          float hearthGlow = exp(-hearthDist * 2.4) * hearthPulse * 0.45;
+          vec3 hearthBloomColor = mix(softAmber, warmSaffron, 0.6);
+
+          // ===================================================================
+          // 2. LIGHT & WISPY VOLUMETRIC SMOKE PLUMES
+          // ===================================================================
+          // Smoke rises gently and dissipates into delicate culinary wisps
+          float smokeTime = t * 0.28;
+          vec2 smokeUv1 = vec2(st.x * 1.2 + totalOffset.x * 0.6, st.y * 1.4 - smokeTime * 0.65);
+          vec2 smokeUv2 = vec2(st.x * 1.8 - totalOffset.x * 0.5, st.y * 1.9 - smokeTime * 0.9);
+
+          float smokeWarp = domainWarpFbm(smokeUv1, smokeTime);
+          float smokeNoise2 = fbm(smokeUv2 + smokeWarp * 0.7);
+
+          // Soft wispy smoke density
+          float smokeDensity = smoothstep(-0.15, 0.7, smokeNoise2 + smokeWarp * 0.3);
+          
+          // Gentle vertical envelope: fades out smoothly upwards
+          float smokeVerticalEnvelope = smoothstep(0.0, 0.2, uv.y) * smoothstep(0.95, 0.15, uv.y);
+          smokeDensity *= smokeVerticalEnvelope * 0.42;
+
+          // Warm firelight rim illumination on smoke
+          float fireIllumination = exp(-length(vec2((uv.x - 0.5) * aspect * 1.0, uv.y * 1.7)) * 2.1) * hearthPulse;
+          
+          // Culinary soft vapor tones
+          vec3 ambientVapor = vec3(0.42, 0.40, 0.44);     // Soft translucent vapor
+          vec3 illuminatedVapor = vec3(0.95, 0.68, 0.32); // Warm firelit golden smoke
+          vec3 smokeColor = mix(ambientVapor, illuminatedVapor, clamp(fireIllumination * 1.1, 0.0, 0.75));
+
+          // ===================================================================
+          // 3. COMPOSITE LIGHT FIRE & SMOKE
+          // ===================================================================
+          vec3 finalColor = vec3(0.0);
+          
+          // Add soft illuminated smoke
+          finalColor += smokeColor * (smokeDensity * 0.7);
+
+          // Add gentle hearth fire bloom
+          finalColor += hearthBloomColor * (hearthGlow * 0.35);
+
+          // Add soft licking flame accents
+          finalColor += flameColor * (flameIntensity * 0.75);
+
+          // Clean, soft alpha transparency for light atmospheric luxury
+          float finalAlpha = clamp(
+            flameIntensity * 0.65 + 
+            smokeDensity * 0.45 + 
+            hearthGlow * 0.35, 
+            0.0, 0.55
+          );
 
           gl_FragColor = vec4(finalColor, finalAlpha);
         }
       `;
 
-      const fogUniforms = {
+      const fireUniforms = {
         uTime: { value: 0 },
         uResolution: { value: new THREE.Vector2(width, height) },
-        uMouse: { value: new THREE.Vector2(0.5, 0.5) }
+        uMouse: { value: new THREE.Vector2(0.5, 0.3) },
+        uWind: { value: new THREE.Vector2(0.0, 0.0) }
       };
 
-      const fogMaterial = new THREE.ShaderMaterial({
-        vertexShader: fogVertexShader,
-        fragmentShader: fogFragmentShader,
-        uniforms: fogUniforms,
+      const fireMaterial = new THREE.ShaderMaterial({
+        vertexShader: fireSmokeVertexShader,
+        fragmentShader: fireSmokeFragmentShader,
+        uniforms: fireUniforms,
         transparent: true,
         depthWrite: false,
         depthTest: false
       });
 
-      const fogPlane = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), fogMaterial);
-      scene.add(fogPlane);
+      const firePlane = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), fireMaterial);
+      scene.add(firePlane);
 
       // -----------------------------------------------------------------------
-      // 3. Floating Glowing Ember Particles (GPU Points + Additive Blending)
+      // 3. Pointer Tracking & Subtle Fluid Wind Impulse
       // -----------------------------------------------------------------------
-      const emberCount = window.innerWidth < 768 ? 32 : 68;
-      const emberGeometry = new THREE.BufferGeometry();
+      const targetMouse = { x: 0.5, y: 0.3 };
+      const currentMouse = { x: 0.5, y: 0.3 };
+      const windVelocity = { x: 0.0, y: 0.0 };
+      let lastMousePos = { x: 0.5, y: 0.3, time: performance.now() };
 
-      const positions = new Float32Array(emberCount * 3);
-      const randoms = new Float32Array(emberCount * 4); // [speedY, swayFreq, swayAmp, phase]
-      const scales = new Float32Array(emberCount);
-      const colorTypes = new Float32Array(emberCount);
+      function onPointerMove(clientX, clientY) {
+        const x = clientX / window.innerWidth;
+        const y = 1.0 - (clientY / window.innerHeight);
+        
+        targetMouse.x = x;
+        targetMouse.y = y;
 
-      for (let i = 0; i < emberCount; i++) {
-        // Distribute across screen coordinates (-1 to 1)
-        positions[i * 3 + 0] = (Math.random() * 2 - 1);
-        positions[i * 3 + 1] = (Math.random() * 2 - 1);
-        positions[i * 3 + 2] = 0;
+        const now = performance.now();
+        const dt = Math.max(now - lastMousePos.time, 16) / 1000;
+        const vx = (x - lastMousePos.x) / dt;
+        const vy = (y - lastMousePos.y) / dt;
 
-        randoms[i * 4 + 0] = 0.0018 + Math.random() * 0.0035; // speed Y
-        randoms[i * 4 + 1] = 0.8 + Math.random() * 1.6;        // sway frequency
-        randoms[i * 4 + 2] = 0.04 + Math.random() * 0.12;      // sway amplitude
-        randoms[i * 4 + 3] = Math.random() * Math.PI * 2;      // phase offset
+        // Apply gentle wind push
+        windVelocity.x = Math.max(-1.0, Math.min(1.0, windVelocity.x + vx * 0.025));
+        windVelocity.y = Math.max(-1.0, Math.min(1.0, windVelocity.y + vy * 0.025));
 
-        scales[i] = 2.0 + Math.random() * 4.5;
-        colorTypes[i] = Math.random(); // mix factor between gold & amber spark
+        lastMousePos = { x, y, time: now };
       }
 
-      emberGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-      emberGeometry.setAttribute('aRandom', new THREE.BufferAttribute(randoms, 4));
-      emberGeometry.setAttribute('aScale', new THREE.BufferAttribute(scales, 1));
-      emberGeometry.setAttribute('aColorType', new THREE.BufferAttribute(colorTypes, 1));
-
-      const emberVertexShader = `
-        attribute vec4 aRandom;
-        attribute float aScale;
-        attribute float aColorType;
-
-        uniform float uTime;
-        uniform vec2 uMouse;
-
-        varying float vAlpha;
-        varying float vColorType;
-
-        void main() {
-          vec3 pos = position;
-          float t = uTime;
-
-          // Upward convective drift
-          float speedY = aRandom.x;
-          float swayFreq = aRandom.y;
-          float swayAmp = aRandom.z;
-          float phase = aRandom.w;
-
-          // Progressive upward movement with loop reset
-          float yOffset = mod(pos.y + 1.0 + t * speedY * 60.0, 2.2) - 1.1;
-          
-          // Horizontal swaying
-          float xOffset = pos.x + sin(t * swayFreq + phase) * swayAmp + (uMouse.x - 0.5) * 0.06;
-
-          vec3 finalPos = vec3(xOffset, yOffset, 0.0);
-
-          // Subtle twinkle & edge fading
-          float normalizedY = (yOffset + 1.0) * 0.5;
-          float heightFade = smoothstep(0.0, 0.25, normalizedY) * smoothstep(1.0, 0.65, normalizedY);
-          float twinkle = 0.7 + 0.3 * sin(t * 3.5 + phase * 4.0);
-
-          vAlpha = heightFade * twinkle * 0.9;
-          vColorType = aColorType;
-
-          gl_Position = vec4(finalPos, 1.0);
-          gl_PointSize = aScale * (0.85 + 0.3 * twinkle);
-        }
-      `;
-
-      const emberFragmentShader = `
-        precision highp float;
-        varying float vAlpha;
-        varying float vColorType;
-
-        void main() {
-          vec2 coord = gl_PointCoord - vec2(0.5);
-          float dist = length(coord);
-          if (dist > 0.5) discard;
-
-          // Soft Gaussian point falloff with incandescent center
-          float softCircle = smoothstep(0.5, 0.05, dist);
-          float hotCore = smoothstep(0.18, 0.0, dist);
-
-          vec3 goldColor = vec3(1.0, 0.82, 0.32);
-          vec3 amberColor = vec3(1.0, 0.45, 0.12);
-          vec3 emberColor = mix(amberColor, goldColor, vColorType);
-          emberColor += vec3(1.0, 1.0, 0.9) * hotCore * 0.65;
-
-          gl_FragColor = vec4(emberColor, vAlpha * softCircle);
-        }
-      `;
-
-      const emberUniforms = {
-        uTime: { value: 0 },
-        uMouse: { value: new THREE.Vector2(0.5, 0.5) }
-      };
-
-      const emberMaterial = new THREE.ShaderMaterial({
-        vertexShader: emberVertexShader,
-        fragmentShader: emberFragmentShader,
-        uniforms: emberUniforms,
-        transparent: true,
-        blending: THREE.AdditiveBlending,
-        depthWrite: false,
-        depthTest: false
-      });
-
-      const emberPoints = new THREE.Points(emberGeometry, emberMaterial);
-      scene.add(emberPoints);
-
-      // -----------------------------------------------------------------------
-      // 4. Mouse Tracking & Fluid Parallax Interpolation
-      // -----------------------------------------------------------------------
-      const targetMouse = { x: 0.5, y: 0.5 };
-      const currentMouse = { x: 0.5, y: 0.5 };
-
-      window.addEventListener('mousemove', (e) => {
-        targetMouse.x = e.clientX / window.innerWidth;
-        targetMouse.y = 1.0 - (e.clientY / window.innerHeight);
-      }, { passive: true });
-
-      // Touch handler for mobile parallax
+      window.addEventListener('mousemove', (e) => onPointerMove(e.clientX, e.clientY), { passive: true });
       window.addEventListener('touchmove', (e) => {
         if (e.touches && e.touches[0]) {
-          targetMouse.x = e.touches[0].clientX / window.innerWidth;
-          targetMouse.y = 1.0 - (e.touches[0].clientY / window.innerHeight);
+          onPointerMove(e.touches[0].clientX, e.touches[0].clientY);
         }
       }, { passive: true });
 
       // -----------------------------------------------------------------------
-      // 5. Render Loop & IntersectionObserver Lifecycle
+      // 4. Render Loop & Lifecycle Optimizations
       // -----------------------------------------------------------------------
       let isVisible = true;
       let animFrameId = null;
@@ -332,39 +311,40 @@
         const elapsedTime = clock.getElapsedTime();
 
         // Smooth mouse damping (lerp)
-        currentMouse.x += (targetMouse.x - currentMouse.x) * 0.04;
-        currentMouse.y += (targetMouse.y - currentMouse.y) * 0.04;
+        currentMouse.x += (targetMouse.x - currentMouse.x) * 0.05;
+        currentMouse.y += (targetMouse.y - currentMouse.y) * 0.05;
 
-        // Add subtle auto-drift for mobile when mouse is still
-        const autoDriftX = Math.sin(elapsedTime * 0.35) * 0.03;
-        const autoDriftY = Math.cos(elapsedTime * 0.28) * 0.02;
+        // Wind velocity damping & organic ambient draft
+        windVelocity.x *= 0.95;
+        windVelocity.y *= 0.95;
 
-        const finalMouseX = currentMouse.x + autoDriftX;
-        const finalMouseY = currentMouse.y + autoDriftY;
+        const ambientDraftX = Math.sin(elapsedTime * 0.5) * 0.03;
+        const ambientDraftY = Math.cos(elapsedTime * 0.35) * 0.015;
 
-        // Update uniforms
-        fogUniforms.uTime.value = elapsedTime;
-        fogUniforms.uMouse.value.set(finalMouseX, finalMouseY);
+        const totalWindX = windVelocity.x + ambientDraftX;
+        const totalWindY = windVelocity.y + ambientDraftY;
 
-        emberUniforms.uTime.value = elapsedTime;
-        emberUniforms.uMouse.value.set(finalMouseX, finalMouseY);
+        // Update Shader Uniforms
+        fireUniforms.uTime.value = elapsedTime;
+        fireUniforms.uMouse.value.set(currentMouse.x, currentMouse.y);
+        fireUniforms.uWind.value.set(totalWindX, totalWindY);
 
         renderer.render(scene, camera);
         animFrameId = requestAnimationFrame(animate);
       }
 
-      // Resize handler
+      // Resize Handler
       function handleResize() {
         width = heroSection.clientWidth || window.innerWidth;
         height = heroSection.clientHeight || window.innerHeight;
 
         renderer.setSize(width, height);
-        fogUniforms.uResolution.value.set(width, height);
+        fireUniforms.uResolution.value.set(width, height);
       }
 
       window.addEventListener('resize', handleResize, { passive: true });
 
-      // Pause loop when scrolled out of view to preserve 100% battery & CPU
+      // IntersectionObserver for 0% battery/CPU consumption when scrolled out of view
       if ('IntersectionObserver' in window) {
         const observer = new IntersectionObserver((entries) => {
           entries.forEach(entry => {
@@ -391,10 +371,113 @@
       animFrameId = requestAnimationFrame(animate);
 
     } catch (err) {
-      console.warn('WebGL hero atmosphere initialization fallback active:', err);
-      if (fallbackEl) fallbackEl.style.display = 'block';
-      if (canvas) canvas.style.display = 'none';
+      console.warn('WebGL initialization error, falling back to Canvas 2D:', err);
+      initCanvas2DFallback(canvas, container);
     }
+  }
+
+  // ---------------------------------------------------------------------------
+  // 5. Clean & Lightweight Canvas 2D Fallback Engine (No Particles)
+  // ---------------------------------------------------------------------------
+  function initCanvas2DFallback(canvas, container) {
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+      const fallbackEl = document.querySelector('.hero-fx-fallback');
+      if (fallbackEl) fallbackEl.style.display = 'block';
+      return;
+    }
+
+    const heroSection = container.closest('.hero-section') || container;
+    let width = (canvas.width = heroSection.clientWidth || window.innerWidth);
+    let height = (canvas.height = heroSection.clientHeight || window.innerHeight);
+
+    window.addEventListener('resize', () => {
+      width = canvas.width = heroSection.clientWidth || window.innerWidth;
+      height = canvas.height = heroSection.clientHeight || window.innerHeight;
+    }, { passive: true });
+
+    // Soft Wispy Smoke & Flame Puffs (No Sparks/Particles)
+    const puffs = [];
+    const puffCount = 28;
+
+    class SmokePuff2D {
+      constructor() {
+        this.reset(true);
+      }
+
+      reset(init = false) {
+        this.x = width * (0.35 + Math.random() * 0.3);
+        this.y = init ? height * (0.5 + Math.random() * 0.5) : height + Math.random() * 20;
+        this.vx = (Math.random() - 0.5) * 0.5;
+        this.vy = -(0.8 + Math.random() * 1.4);
+        this.radius = 35 + Math.random() * 55;
+        this.maxRadius = this.radius * (1.8 + Math.random() * 1.2);
+        this.alpha = 0.0;
+        this.maxAlpha = 0.08 + Math.random() * 0.12;
+        this.life = 0;
+        this.maxLife = 140 + Math.random() * 100;
+        this.isWarm = Math.random() > 0.6;
+      }
+
+      update() {
+        this.life++;
+        this.x += this.vx + Math.sin(this.life * 0.04) * 0.4;
+        this.y += this.vy;
+        this.radius += (this.maxRadius - this.radius) * 0.012;
+
+        const progress = this.life / this.maxLife;
+        if (progress < 0.25) {
+          this.alpha = (progress / 0.25) * this.maxAlpha;
+        } else if (progress > 0.55) {
+          this.alpha = (1.0 - (progress - 0.55) / 0.45) * this.maxAlpha;
+        }
+
+        if (this.life >= this.maxLife || this.y < -this.radius) {
+          this.reset();
+        }
+      }
+
+      draw(c) {
+        if (this.alpha <= 0) return;
+        c.save();
+        c.beginPath();
+        const grad = c.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.radius);
+        
+        if (this.isWarm) {
+          grad.addColorStop(0, `rgba(255, 180, 60, ${this.alpha * 0.9})`);
+          grad.addColorStop(0.45, `rgba(220, 110, 30, ${this.alpha * 0.45})`);
+          grad.addColorStop(1, 'rgba(120, 40, 10, 0)');
+        } else {
+          grad.addColorStop(0, `rgba(210, 195, 185, ${this.alpha * 0.65})`);
+          grad.addColorStop(0.5, `rgba(90, 85, 95, ${this.alpha * 0.3})`);
+          grad.addColorStop(1, 'rgba(40, 35, 45, 0)');
+        }
+
+        c.fillStyle = grad;
+        c.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        c.fill();
+        c.restore();
+      }
+    }
+
+    for (let i = 0; i < puffCount; i++) {
+      puffs.push(new SmokePuff2D());
+    }
+
+    function loop2D() {
+      ctx.clearRect(0, 0, width, height);
+      ctx.globalCompositeOperation = 'screen';
+
+      puffs.forEach(p => {
+        p.update();
+        p.draw(ctx);
+      });
+
+      requestAnimationFrame(loop2D);
+    }
+
+    loop2D();
   }
 
   // Run on DOM Ready

@@ -58,10 +58,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Update Address & Hours
   document.querySelectorAll('[data-bind="business-address"]').forEach(el => {
-    el.textContent = business.address || 'Libin Catering Service & Event Management, Tamil Nadu, India';
+    el.textContent = business.address || 'Libin Catering Services, Tamil Nadu, India';
   });
   document.querySelectorAll('[data-bind="business-hours"]').forEach(el => {
     el.textContent = business.openingHours || 'Mon - Sun: 7:00 AM - 10:30 PM (24/7 Event Booking)';
+  });
+
+  // Update Google Maps & Reviews Elements
+  document.querySelectorAll('[data-bind="map-embed-src"]').forEach(el => {
+    if (business.mapEmbedUrl) el.src = business.mapEmbedUrl;
+  });
+  document.querySelectorAll('[data-bind="google-maps-href"]').forEach(el => {
+    if (business.googleMapsUrl) {
+      el.href = business.googleMapsUrl;
+      el.target = '_blank';
+      el.rel = 'noopener noreferrer';
+    }
+  });
+  document.querySelectorAll('[data-bind="google-reviews-href"]').forEach(el => {
+    if (business.googleReviewsUrl) {
+      el.href = business.googleReviewsUrl;
+      el.target = '_blank';
+      el.rel = 'noopener noreferrer';
+    }
+  });
+  document.querySelectorAll('[data-bind="google-rating"]').forEach(el => {
+    el.textContent = business.googleRating || '4.9';
+  });
+  document.querySelectorAll('[data-bind="google-review-count"]').forEach(el => {
+    el.textContent = business.googleReviewCount || '150+';
   });
 
   // 3. Global Toast Notification System
@@ -132,5 +157,53 @@ document.addEventListener('DOMContentLoaded', () => {
         submitBtn.innerHTML = originalText;
       }
     });
+  }
+
+  // 6. Cinematic Hero Culinary Slider Controller
+  const heroSlides = document.querySelectorAll('.hero-slide');
+  const heroDots = document.querySelectorAll('.hero-slider-dot');
+  if (heroSlides.length > 0) {
+    let currentSlide = 0;
+    let sliderTimer = null;
+
+    function goToSlide(index) {
+      heroSlides.forEach((slide, i) => {
+        if (i === index) {
+          slide.classList.add('active');
+        } else {
+          slide.classList.remove('active');
+        }
+      });
+
+      heroDots.forEach((dot, i) => {
+        if (i === index) {
+          dot.classList.add('active');
+        } else {
+          dot.classList.remove('active');
+        }
+      });
+
+      currentSlide = index;
+    }
+
+    function startSlider() {
+      if (sliderTimer) clearInterval(sliderTimer);
+      sliderTimer = setInterval(() => {
+        const nextIndex = (currentSlide + 1) % heroSlides.length;
+        goToSlide(nextIndex);
+      }, 5500);
+    }
+
+    heroDots.forEach((dot) => {
+      dot.addEventListener('click', () => {
+        const idx = parseInt(dot.getAttribute('data-slide'), 10);
+        if (!isNaN(idx)) {
+          goToSlide(idx);
+          startSlider();
+        }
+      });
+    });
+
+    startSlider();
   }
 });
