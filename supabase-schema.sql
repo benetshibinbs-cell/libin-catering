@@ -151,17 +151,23 @@ CREATE INDEX IF NOT EXISTS idx_gallery_published ON public.gallery (is_published
 CREATE INDEX IF NOT EXISTS idx_gallery_order ON public.gallery (display_order ASC);
 
 -- -----------------------------------------------------------------------------
--- 8. Table: Contact Information
+-- 8. Table: Contact Information & Branding
 -- -----------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS public.contact_information (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     business_name VARCHAR(200) NOT NULL DEFAULT 'Libin Catering Service & Event Management',
+    logo_url TEXT DEFAULT 'assets/images/logo.png',
+    footer_logo_url TEXT DEFAULT 'assets/images/logo.png',
+    hero_badge VARCHAR(150) DEFAULT 'Premium Catering & Event Management',
+    hero_title VARCHAR(200) DEFAULT 'Exceptional Food.',
+    hero_subtitle VARCHAR(200) DEFAULT 'Unforgettable Celebrations.',
+    hero_desc TEXT DEFAULT 'Authentic flavours, thoughtful presentation and seamless catering for weddings, celebrations, corporate events and every occasion worth remembering.',
     primary_phone VARCHAR(30) NOT NULL DEFAULT '+91 9677476609',
     secondary_phone VARCHAR(30) DEFAULT '+91 9442779796',
     whatsapp_number VARCHAR(30) NOT NULL DEFAULT '+91 9442779796',
     email VARCHAR(150) NOT NULL DEFAULT 'libincateringservice@gmail.com',
     address TEXT NOT NULL DEFAULT 'Libin Catering Service, Main Road, Tamil Nadu, India',
-    map_embed_url TEXT DEFAULT 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d126353.47352378964!2d77.3486121404179!3d8.18873994326127!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b04f128c7c98863%3A0xc078107c1fa77ea6!2sNagercoil%2C%20Tamil%20Nadu!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin',
+    map_embed_url TEXT DEFAULT 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3948.3304938096355!2d77.1285269!3d8.3078817!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b05ab04435abe27%3A0x12a4c587ff77f9e!2sLibin%20Catering%20Services!5e0!3m2!1sen!2sin!4v1708850000000!5m2!1sen!2sin',
     opening_hours TEXT DEFAULT 'Mon - Sun: 7:00 AM - 10:30 PM (24/7 Event Support)',
     facebook_url TEXT DEFAULT 'https://facebook.com',
     instagram_url TEXT DEFAULT 'https://instagram.com',
@@ -175,7 +181,55 @@ BEFORE UPDATE ON public.contact_information
 FOR EACH ROW EXECUTE FUNCTION set_updated_at_column();
 
 -- -----------------------------------------------------------------------------
--- 9. Table: Site Settings (Key-Value Store)
+-- 9. Table: Signature Services
+-- -----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS public.services (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    title VARCHAR(150) NOT NULL,
+    slug VARCHAR(180) NOT NULL UNIQUE,
+    icon VARCHAR(100) NOT NULL DEFAULT 'bi-heart-fill',
+    description TEXT NOT NULL,
+    image_url TEXT NOT NULL,
+    button_text VARCHAR(100) NOT NULL DEFAULT 'Enquire Service',
+    link_url VARCHAR(250) NOT NULL DEFAULT 'contact.html#enquiry-form',
+    display_order INTEGER NOT NULL DEFAULT 0,
+    is_active BOOLEAN NOT NULL DEFAULT true,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TRIGGER trg_services_updated_at
+BEFORE UPDATE ON public.services
+FOR EACH ROW EXECUTE FUNCTION set_updated_at_column();
+
+CREATE INDEX IF NOT EXISTS idx_services_order ON public.services (display_order ASC);
+CREATE INDEX IF NOT EXISTS idx_services_active ON public.services (is_active);
+
+-- -----------------------------------------------------------------------------
+-- 10. Table: Hero Banner Slides
+-- -----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS public.hero_slides (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    title VARCHAR(200) NOT NULL,
+    dish_name VARCHAR(200) NOT NULL,
+    nav_label VARCHAR(100) NOT NULL,
+    subtitle VARCHAR(200),
+    image_url TEXT NOT NULL,
+    display_order INTEGER NOT NULL DEFAULT 0,
+    is_active BOOLEAN NOT NULL DEFAULT true,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TRIGGER trg_hero_slides_updated_at
+BEFORE UPDATE ON public.hero_slides
+FOR EACH ROW EXECUTE FUNCTION set_updated_at_column();
+
+CREATE INDEX IF NOT EXISTS idx_hero_slides_order ON public.hero_slides (display_order ASC);
+CREATE INDEX IF NOT EXISTS idx_hero_slides_active ON public.hero_slides (is_active);
+
+-- -----------------------------------------------------------------------------
+-- 11. Table: Site Settings (Key-Value Store)
 -- -----------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS public.site_settings (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -194,9 +248,15 @@ FOR EACH ROW EXECUTE FUNCTION set_updated_at_column();
 -- SEED INITIAL PRODUCTION DATA
 -- =============================================================================
 
--- Seed Contact Information
+-- Seed Contact Information & Branding
 INSERT INTO public.contact_information (
     business_name,
+    logo_url,
+    footer_logo_url,
+    hero_badge,
+    hero_title,
+    hero_subtitle,
+    hero_desc,
     primary_phone,
     secondary_phone,
     whatsapp_number,
@@ -205,6 +265,12 @@ INSERT INTO public.contact_information (
     opening_hours
 ) VALUES (
     'Libin Catering Service & Event Management',
+    'assets/images/logo.png',
+    'assets/images/logo.png',
+    'Premium Catering & Event Management',
+    'Exceptional Food.',
+    'Unforgettable Celebrations.',
+    'Authentic flavours, thoughtful presentation and seamless catering for weddings, celebrations, corporate events and every occasion worth remembering.',
     '+91 9677476609',
     '+91 9442779796',
     '+91 9442779796',
@@ -257,4 +323,22 @@ INSERT INTO public.gallery (title, category, image_url, caption, display_order, 
 ('Dessert & Fruit Carving Station', 'Buffets', 'https://images.unsplash.com/photo-1599488615731-7e5c2823ff28?q=80&w=1000&auto=format&fit=crop', 'Artisanal dessert bar with live payasam fountains and tropical fruit carvings', 6, true),
 ('Flaky Malabar Parotta Live Counter', 'Food', 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?q=80&w=1000&auto=format&fit=crop', 'Live griddle preparing steaming hot layered parottas', 7, true),
 ('Evening Reception Illumination', 'Celebrations', 'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?q=80&w=1000&auto=format&fit=crop', 'Cinematic outdoor dining ambiance for luxury evening weddings', 8, true)
+ON CONFLICT DO NOTHING;
+
+-- Seed Signature Services
+INSERT INTO public.services (id, title, slug, icon, description, image_url, button_text, link_url, display_order, is_active) VALUES
+('a0000000-0000-0000-0000-000000000001', 'Wedding Catering', 'wedding-catering', 'bi-heart-fill', 'Grand multi-cuisine buffets, wood-fired dum biryanis, and traditional banana leaf wedding feasts tailored for your special day.', 'assets/images/hero-slide-1.jpg', 'Plan Wedding Feast', 'contact.html?service=Wedding%20Catering#enquiry-form', 1, true),
+('a0000000-0000-0000-0000-000000000002', 'Event Catering', 'event-catering', 'bi-calendar-heart', 'Complete catering for engagements, housewarmings, birthday celebrations, and family anniversaries.', 'assets/images/hero-slide-2.jpg', 'Enquire Service', 'contact.html?service=Event%20Catering#enquiry-form', 2, true),
+('a0000000-0000-0000-0000-000000000003', 'Decoration & Stage Setup', 'decoration-stage-setup', 'bi-flower1', 'Bespoke floral mandaps, thematic entrance arches, mood lighting, and luxury table scape styling.', 'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?q=80&w=800&auto=format&fit=crop', 'Explore Decor', 'contact.html?service=Decoration#enquiry-form', 3, true),
+('a0000000-0000-0000-0000-000000000004', 'Professional Catering Staff', 'professional-catering-staff', 'bi-people-fill', 'Courteous, neatly uniformed, and seasoned captains and service staff ensuring silver-standard guest hospitality.', 'assets/images/hero-slide-4.jpg', 'Hire Staff', 'contact.html?service=Catering%20Staff#enquiry-form', 4, true),
+('a0000000-0000-0000-0000-000000000005', 'Corporate Catering', 'corporate-catering', 'bi-briefcase-fill', 'Sophisticated executive dining, annual galas, breakfast boxes, and conference spreads tailored for enterprises.', 'https://images.unsplash.com/photo-1528605248659-1440064c761d?q=80&w=800&auto=format&fit=crop', 'Corporate Booking', 'contact.html?service=Corporate%20Catering#enquiry-form', 5, true),
+('a0000000-0000-0000-0000-000000000006', 'Custom Events & Live Counters', 'custom-events-live-counters', 'bi-stars', 'Live dosa stations, sizzling grills, chaat counters, and custom dessert fountains customized to your preference.', 'assets/images/hero-slide-3.jpg', 'Customize Event', 'contact.html?service=Custom%20Events#enquiry-form', 6, true)
+ON CONFLICT (slug) DO NOTHING;
+
+-- Seed Hero Banner Slides
+INSERT INTO public.hero_slides (id, title, dish_name, nav_label, subtitle, image_url, display_order, is_active) VALUES
+('b0000000-0000-0000-0000-000000000001', 'Wood-Fired Mutton Dum Biryani', 'Kerala Malabar Dum Biryani', 'Wood-Fired Dum Biryani', 'Authentic slow-cooked copper cauldron biryani', 'assets/images/hero-slide-1.jpg', 1, true),
+('b0000000-0000-0000-0000-000000000002', 'Authentic Kerala Nool Parotta', 'Authentic Kerala Nool Parotta', 'Live Parotta & Salna', 'Flaky layered live tawa parottas with rich salna', 'assets/images/hero-slide-2.jpg', 2, true),
+('b0000000-0000-0000-0000-000000000003', 'Traditional Banana Leaf Sadhya', 'Traditional Kerala Sadhya Feast', 'Banana Leaf Sadhya', '24-item traditional royal wedding feast', 'assets/images/hero-slide-4.jpg', 3, true),
+('b0000000-0000-0000-0000-000000000004', 'Grand Wedding Buffet & Counters', 'Grand South Indian Banquet & Live Counters', 'Grand Buffet & Live Counters', 'Illuminated lawn buffets and live catering stations', 'assets/images/hero-slide-3.jpg', 4, true)
 ON CONFLICT DO NOTHING;

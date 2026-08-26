@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Events Management | Admin Portal</title>
+  <title>Signature Services | Admin Portal</title>
   <!-- Favicon & Touch Icons -->
   <link rel="icon" type="image/x-icon" href="../favicon.ico">
   <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32x32.png">
@@ -30,14 +30,14 @@
     <!-- Sidebar -->
     <aside class="admin-sidebar" id="adminSidebar">
       <div class="admin-sidebar-brand">
-        <img src="../assets/images/logo.png" alt="Libin Catering">
+        <img src="../assets/images/logo.png" alt="Libin Catering" data-bind="brand-logo">
       </div>
       <nav class="admin-nav">
         <a href="dashboard.html" class="admin-nav-link"><i class="bi bi-speedometer2"></i> Dashboard</a>
         <a href="menu.html" class="admin-nav-link"><i class="bi bi-book"></i> Menu Items</a>
         <a href="categories.html" class="admin-nav-link"><i class="bi bi-tags"></i> Categories</a>
-        <a href="services.html" class="admin-nav-link"><i class="bi bi-award"></i> Signature Services</a>
-        <a href="events.html" class="admin-nav-link active"><i class="bi bi-calendar-event"></i> Events</a>
+        <a href="services.html" class="admin-nav-link active"><i class="bi bi-award"></i> Signature Services</a>
+        <a href="events.html" class="admin-nav-link"><i class="bi bi-calendar-event"></i> Events</a>
         <a href="enquiries.html" class="admin-nav-link"><i class="bi bi-envelope-paper"></i> Enquiries</a>
         <a href="gallery.html" class="admin-nav-link"><i class="bi bi-images"></i> Gallery</a>
         <a href="contact.html" class="admin-nav-link"><i class="bi bi-geo-alt"></i> Branding & Contact</a>
@@ -54,17 +54,18 @@
           <button class="btn btn-sm btn-outline-dark d-lg-none" id="toggleSidebar">
             <i class="bi bi-list fs-5"></i>
           </button>
-          <h4 class="font-serif mb-0">Events & Banquets Showcase</h4>
+          <h4 class="font-serif mb-0">Signature Catering & Event Services</h4>
         </div>
-        <button class="btn btn-gold btn-sm" id="btnAddEvent">
-          <i class="bi bi-plus-lg me-1"></i> Add Event
+        <button class="btn btn-gold btn-sm" id="btnAddService">
+          <i class="bi bi-plus-lg me-1"></i> Add Service
         </button>
       </header>
 
       <div class="admin-main-container">
         <div class="admin-card">
-          <div class="admin-card-header">
-            <h5 class="font-serif mb-0">All Showcased Events</h5>
+          <div class="admin-card-header d-flex justify-content-between align-items-center">
+            <h5 class="font-serif mb-0">All Homepage Services</h5>
+            <small class="text-muted">Managed live in Supabase PostgreSQL & Storage</small>
           </div>
           <div class="admin-card-body p-0">
             <div class="table-responsive">
@@ -72,16 +73,17 @@
                 <thead>
                   <tr>
                     <th>Cover</th>
-                    <th>Title & Location</th>
-                    <th>Type</th>
-                    <th>Date</th>
-                    <th>Guest Count</th>
+                    <th>Icon</th>
+                    <th>Service Name</th>
+                    <th>Description</th>
+                    <th>Button CTA</th>
+                    <th>Order</th>
                     <th>Status</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
-                <tbody id="adminEventTableBody">
-                  <!-- Rendered via js/event-admin.js -->
+                <tbody id="adminServiceTableBody">
+                  <!-- Rendered via js/service-admin.js -->
                 </tbody>
               </table>
             </div>
@@ -91,95 +93,95 @@
     </main>
   </div>
 
-  <!-- Event Modal -->
-  <div class="modal fade" id="eventModal" tabindex="-1" aria-hidden="true">
+  <!-- Service Modal -->
+  <div class="modal fade" id="serviceModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
       <div class="modal-content border-0 shadow-lg">
         <div class="modal-header bg-noir text-white py-3">
-          <h5 class="modal-title font-serif" id="modalTitle">Add Event</h5>
+          <h5 class="modal-title font-serif" id="modalTitle">Add Signature Service</h5>
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body p-4 bg-white">
-          <form id="eventForm">
-            <input type="hidden" id="eventId">
+          <form id="serviceForm">
+            <input type="hidden" id="serviceId">
 
             <div class="row g-3 mb-3">
               <div class="col-md-8">
-                <label class="form-label">Event Title *</label>
-                <input type="text" id="eventTitle" class="form-control" placeholder="e.g. Royal Heritage Wedding Banquet" required>
+                <label class="form-label fw-bold">Service Title *</label>
+                <input type="text" id="serviceTitle" class="form-control" placeholder="e.g. Wedding Catering" required>
               </div>
               <div class="col-md-4">
-                <label class="form-label">Event Type *</label>
-                <select id="eventType" class="form-select" required>
-                  <option value="Wedding">Wedding</option>
-                  <option value="Reception">Reception</option>
-                  <option value="Corporate Catering">Corporate Catering</option>
-                  <option value="Custom Events">Custom Events</option>
-                  <option value="Housewarming">Housewarming</option>
-                </select>
+                <label class="form-label fw-bold">Icon *</label>
+                <div class="input-group">
+                  <span class="input-group-text" id="iconPreview"><i class="bi bi-heart-fill"></i></span>
+                  <select id="serviceIcon" class="form-select" required>
+                    <option value="bi-heart-fill">Heart (Weddings)</option>
+                    <option value="bi-calendar-heart">Calendar Heart (Events)</option>
+                    <option value="bi-flower1">Floral / Decor (Stage)</option>
+                    <option value="bi-people-fill">People / Staff (Hospitality)</option>
+                    <option value="bi-briefcase-fill">Briefcase (Corporate)</option>
+                    <option value="bi-stars">Stars (Live Counters / Custom)</option>
+                    <option value="bi-cup-hot-fill">Hot Cup (Beverages)</option>
+                    <option value="bi-cake2-fill">Cake / Sweets</option>
+                    <option value="bi-fire">Fire / Live Grill</option>
+                    <option value="bi-gem">Luxury / Royal</option>
+                  </select>
+                </div>
               </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-bold">Service Cover Image (Upload File or Enter URL)</label>
+              <div class="row g-2 align-items-center mb-2">
+                <div class="col-md-6">
+                  <input type="file" id="serviceFileInput" class="form-control" accept="image/*">
+                  <small class="text-muted">Upload high-res photo</small>
+                </div>
+                <div class="col-md-6">
+                  <input type="url" id="serviceImageUrl" class="form-control" placeholder="Or image URL (https://...)">
+                  <small class="text-muted">Or direct web URL</small>
+                </div>
+              </div>
+              <div id="serviceImagePreviewWrap" class="mt-2 p-2 bg-light rounded text-center" style="display: none;">
+                <img id="serviceImagePreview" src="" alt="Preview" class="rounded shadow-sm" style="max-height: 140px; width: auto;">
+                <div class="small text-muted mt-1">Service Card Cover Preview</div>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-bold">Short Description *</label>
+              <textarea id="serviceDescription" class="form-control" rows="3" placeholder="Brief summary of offerings, cuisines, and styling included in this service..." required></textarea>
             </div>
 
             <div class="row g-3 mb-3">
-              <div class="col-md-4">
-                <label class="form-label">Event Date</label>
-                <input type="date" id="eventDate" class="form-control">
+              <div class="col-md-6">
+                <label class="form-label fw-bold">CTA Button Text</label>
+                <input type="text" id="serviceButtonText" class="form-control" placeholder="e.g. Plan Wedding Feast" value="Enquire Service">
               </div>
-              <div class="col-md-4">
-                <label class="form-label">Location / City</label>
-                <input type="text" id="eventLocation" class="form-control" placeholder="e.g. Nagercoil">
+              <div class="col-md-6">
+                <label class="form-label fw-bold">Action Link URL</label>
+                <input type="text" id="serviceLinkUrl" class="form-control" placeholder="contact.html?service=...#enquiry-form" value="contact.html#enquiry-form">
               </div>
-              <div class="col-md-4">
-                <label class="form-label">Guest Count</label>
-                <input type="number" id="eventGuestCount" class="form-control" placeholder="e.g. 1200">
-              </div>
-            </div>
-
-            <div class="mb-3">
-              <label class="form-label fw-bold">Event Cover Photo (Upload File or Enter URL)</label>
-              <div class="row g-2 align-items-center mb-2">
-                <div class="col-md-6">
-                  <input type="file" id="eventFileInput" class="form-control" accept="image/*">
-                  <small class="text-muted">Upload photo from device</small>
-                </div>
-                <div class="col-md-6">
-                  <input type="url" id="eventCoverImageUrl" class="form-control" placeholder="Or paste image URL (https://...)">
-                  <small class="text-muted">Or web image link</small>
-                </div>
-              </div>
-              <div id="eventImagePreviewWrap" class="mt-2 p-2 bg-light rounded text-center" style="display: none;">
-                <img id="eventImagePreview" src="" alt="Preview" class="rounded shadow-sm" style="max-height: 130px; width: auto;">
-                <div class="small text-muted mt-1">Event Cover Preview</div>
-              </div>
-            </div>
-
-            <div class="mb-3">
-              <label class="form-label">Event Description</label>
-              <textarea id="eventDescription" class="form-control" rows="3" placeholder="Brief summary of setup, dishes served, and arrangements..."></textarea>
             </div>
 
             <div class="row g-3 mb-4">
-              <div class="col-md-4">
-                <label class="form-label">Display Order</label>
-                <input type="number" id="eventDisplayOrder" class="form-control" value="0">
+              <div class="col-md-6">
+                <label class="form-label fw-bold">Display Order</label>
+                <input type="number" id="serviceDisplayOrder" class="form-control" value="0">
               </div>
-              <div class="col-md-4 d-flex align-items-center pt-4">
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" id="eventIsFeatured">
-                  <label class="form-check-label" for="eventIsFeatured">Featured</label>
-                </div>
-              </div>
-              <div class="col-md-4 d-flex align-items-center pt-4">
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" id="eventIsPublished" checked>
-                  <label class="form-check-label" for="eventIsPublished">Published (Public)</label>
+              <div class="col-md-6 d-flex align-items-center pt-4">
+                <div class="form-check form-switch">
+                  <input class="form-check-input" type="checkbox" id="serviceIsActive" checked>
+                  <label class="form-check-label fw-bold" for="serviceIsActive">Active & Display on Homepage</label>
                 </div>
               </div>
             </div>
 
             <div class="d-flex justify-content-end gap-2">
               <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
-              <button type="submit" class="btn btn-gold">Save Event</button>
+              <button type="submit" class="btn btn-gold" id="btnSaveService">
+                <i class="bi bi-save me-1"></i> Save Service
+              </button>
             </div>
           </form>
         </div>
@@ -194,7 +196,7 @@
   <script src="../js/supabase.js"></script>
   <script src="../js/app.js"></script>
   <script src="js/auth.js"></script>
-  <script src="js/event-admin.js"></script>
+  <script src="js/service-admin.js"></script>
 
   <script>
     document.getElementById('toggleSidebar')?.addEventListener('click', () => {

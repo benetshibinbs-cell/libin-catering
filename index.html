@@ -67,7 +67,7 @@
   <nav class="navbar navbar-expand-lg navbar-dark navbar-main">
     <div class="container">
       <a class="navbar-brand" href="index.html">
-        <img src="assets/images/logo.png" alt="Libin Catering Service" class="logo-img">
+        <img src="assets/images/logo.png" alt="Libin Catering Service" class="logo-img" data-bind="brand-logo">
       </a>
 
       <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -125,7 +125,7 @@
       <div class="row align-items-center">
         <div class="col-lg-8 col-xl-7">
           <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
-            <div class="hero-badge mb-0">
+            <div class="hero-badge mb-0" data-bind="hero-badge">
               <i class="bi bi-stars"></i> Premium Catering & Event Management
             </div>
             <a href="https://www.google.com/maps/place/Libin+Catering+Services/@8.3078817,77.1311018,17z/data=!4m8!3m7!1s0x3b05ab04435abe27:0x12a4c587ff77f9e!8m2!3d8.3078817!4d77.1311018!9m1!1b1!16s%2Fg%2F11j7dyx0g3" target="_blank" rel="noopener noreferrer" class="google-trust-badge-hero" data-bind="google-reviews-href">
@@ -133,11 +133,11 @@
               <span class="text-warning">★ <strong data-bind="google-rating">4.9</strong></span> on Google (<span data-bind="google-review-count">150+</span> Reviews)
             </a>
           </div>
-          <h1 class="hero-title font-serif">
+          <h1 class="hero-title font-serif" data-bind="hero-title">
             Exceptional Food. <br>
             <span class="gold-text">Unforgettable Celebrations.</span>
           </h1>
-          <p class="hero-desc">
+          <p class="hero-desc" data-bind="hero-desc">
             Authentic flavours, thoughtful presentation and seamless catering for weddings, celebrations, corporate events and every occasion worth remembering.
           </p>
 
@@ -249,7 +249,7 @@
         <p class="section-desc">Comprehensive solutions crafted to elevate weddings, celebrations, corporate galas, and festive feasts.</p>
       </div>
 
-      <div class="row g-4">
+      <div class="row g-4" id="signatureServicesGrid">
         <!-- Service 1 -->
         <div class="col-md-6 col-lg-4">
           <div class="service-card">
@@ -674,7 +674,7 @@
       <div class="row g-5">
         <!-- Col 1: Brand -->
         <div class="col-lg-4">
-          <img src="assets/images/logo.png" alt="Libin Catering" class="footer-brand-logo">
+          <img src="assets/images/logo.png" alt="Libin Catering" class="footer-brand-logo" data-bind="footer-brand-logo">
           <p class="text-white-50 mb-4 small">
             Libin Catering Service & Event Management is your trusted partner for authentic South Indian, Biryani, and grand wedding catering across Tamil Nadu.
           </p>

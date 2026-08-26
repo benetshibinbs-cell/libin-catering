@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Contact & Settings | Admin Portal</title>
+  <title>Branding, Hero Banners & Contact | Admin Portal</title>
   <!-- Favicon & Touch Icons -->
   <link rel="icon" type="image/x-icon" href="../favicon.ico">
   <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/favicon-32x32.png">
@@ -30,16 +30,17 @@
     <!-- Sidebar -->
     <aside class="admin-sidebar" id="adminSidebar">
       <div class="admin-sidebar-brand">
-        <img src="../assets/images/logo.png" alt="Libin Catering">
+        <img src="../assets/images/logo.png" alt="Libin Catering" data-bind="brand-logo">
       </div>
       <nav class="admin-nav">
         <a href="dashboard.html" class="admin-nav-link"><i class="bi bi-speedometer2"></i> Dashboard</a>
         <a href="menu.html" class="admin-nav-link"><i class="bi bi-book"></i> Menu Items</a>
         <a href="categories.html" class="admin-nav-link"><i class="bi bi-tags"></i> Categories</a>
+        <a href="services.html" class="admin-nav-link"><i class="bi bi-award"></i> Signature Services</a>
         <a href="events.html" class="admin-nav-link"><i class="bi bi-calendar-event"></i> Events</a>
         <a href="enquiries.html" class="admin-nav-link"><i class="bi bi-envelope-paper"></i> Enquiries</a>
         <a href="gallery.html" class="admin-nav-link"><i class="bi bi-images"></i> Gallery</a>
-        <a href="contact.html" class="admin-nav-link active"><i class="bi bi-geo-alt"></i> Contact Info</a>
+        <a href="contact.html" class="admin-nav-link active"><i class="bi bi-geo-alt"></i> Branding & Contact</a>
         <hr class="my-3 border-secondary">
         <a href="../index.html" target="_blank" class="admin-nav-link"><i class="bi bi-box-arrow-up-right"></i> View Live Site</a>
         <a href="#" class="admin-nav-link text-danger" data-action="admin-logout"><i class="bi bi-box-arrow-left text-danger"></i> Logout</a>
@@ -53,89 +54,350 @@
           <button class="btn btn-sm btn-outline-dark d-lg-none" id="toggleSidebar">
             <i class="bi bi-list fs-5"></i>
           </button>
-          <h4 class="font-serif mb-0">Business Info & Contact Settings</h4>
+          <h4 class="font-serif mb-0">Branding, Hero Banners & Business Settings</h4>
         </div>
       </header>
 
+      <style>
+        .admin-tab-nav {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 10px;
+          background: #ffffff;
+          padding: 12px;
+          border-radius: 12px;
+          border: 1px solid rgba(0,0,0,0.08);
+          box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .admin-tab-btn {
+          color: #212529 !important;
+          background: #f1f3f5;
+          border: 1px solid #dee2e6;
+          border-radius: 8px;
+          padding: 9px 18px !important;
+          font-weight: 600;
+          font-size: 0.95rem;
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          transition: all 0.2s ease;
+          text-decoration: none;
+        }
+        .admin-tab-btn:hover {
+          background: #e9ecef;
+          color: #000000 !important;
+          border-color: #ced4da;
+        }
+        .admin-tab-btn.active {
+          background: #111111 !important;
+          color: #ffffff !important;
+          border-color: #111111 !important;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .admin-tab-btn::after {
+          display: none !important;
+        }
+      </style>
+
       <div class="admin-main-container">
         <div class="row justify-content-center">
-          <div class="col-lg-10">
-            <div class="admin-card">
-              <div class="admin-card-header">
-                <h5 class="font-serif mb-0">Public Business Profile</h5>
+          <div class="col-lg-11">
+
+            <!-- High-Contrast Navigation Tabs -->
+            <div class="admin-tab-nav mb-4" id="settingsTabs" role="tablist">
+              <button class="admin-tab-btn active" id="contact-tab" data-bs-toggle="pill" data-bs-target="#contactTab" type="button" role="tab">
+                <i class="bi bi-telephone-fill text-gold"></i> Business Profile & Contact Info
+              </button>
+              <button class="admin-tab-btn" id="branding-tab" data-bs-toggle="pill" data-bs-target="#brandingTab" type="button" role="tab">
+                <i class="bi bi-image text-gold"></i> Brand Logo
+              </button>
+              <button class="admin-tab-btn" id="hero-banners-tab" data-bs-toggle="pill" data-bs-target="#heroBannersTab" type="button" role="tab">
+                <i class="bi bi-card-image text-gold"></i> Hero Carousel Banners
+              </button>
+              <button class="admin-tab-btn" id="hero-text-tab" data-bs-toggle="pill" data-bs-target="#heroTextTab" type="button" role="tab">
+                <i class="bi bi-type-h1 text-gold"></i> Hero Headlines & Copy
+              </button>
+            </div>
+
+            <div class="tab-content" id="settingsTabContent">
+
+              <!-- TAB 2: BRAND LOGO -->
+              <div class="tab-pane fade" id="brandingTab" role="tabpanel">
+                <div class="admin-card">
+                  <div class="admin-card-header">
+                    <h5 class="font-serif mb-0">Brand Identity & Logo Configuration</h5>
+                  </div>
+                  <div class="admin-card-body">
+                    <form id="logoSettingsForm">
+                      <div class="row g-4 mb-4">
+                        <!-- Main Header Logo -->
+                        <div class="col-md-6">
+                          <div class="p-3 border rounded bg-light h-100">
+                            <label class="form-label fw-bold"><i class="bi bi-shield-shaded text-gold me-1"></i> Main Header Logo</label>
+                            <p class="small text-muted mb-3">Displayed in the sticky navigation header across all pages.</p>
+                            
+                            <div class="mb-3">
+                              <input type="file" id="logoFileInput" class="form-control mb-2" accept="image/*">
+                              <input type="url" id="logoUrlInput" class="form-control" placeholder="Or enter logo image URL">
+                            </div>
+
+                            <div class="text-center p-3 bg-dark rounded">
+                              <img id="headerLogoPreview" src="../assets/images/logo.png" alt="Header Logo" style="max-height: 55px; width: auto;" class="img-fluid">
+                              <div class="small text-white-50 mt-2">Header Logo Preview (on dark background)</div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <!-- Footer Logo -->
+                        <div class="col-md-6">
+                          <div class="p-3 border rounded bg-light h-100">
+                            <label class="form-label fw-bold"><i class="bi bi-badge-ad text-gold me-1"></i> Footer Brand Logo</label>
+                            <p class="small text-muted mb-3">Displayed in the footer branding section.</p>
+                            
+                            <div class="mb-3">
+                              <input type="file" id="footerLogoFileInput" class="form-control mb-2" accept="image/*">
+                              <input type="url" id="footerLogoUrlInput" class="form-control" placeholder="Or enter footer logo URL">
+                            </div>
+
+                            <div class="text-center p-3 bg-dark rounded">
+                              <img id="footerLogoPreview" src="../assets/images/logo.png" alt="Footer Logo" style="max-height: 55px; width: auto;" class="img-fluid">
+                              <div class="small text-white-50 mt-2">Footer Logo Preview (on dark background)</div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="d-flex justify-content-end">
+                        <button type="submit" class="btn btn-gold py-2 px-4" id="btnSaveLogos">
+                          <i class="bi bi-save me-1"></i> Save Logo Settings
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
               </div>
-              <div class="admin-card-body">
-                <form id="contactAdminForm">
-                  <div class="mb-3">
-                    <label class="form-label fw-bold">Business Name *</label>
-                    <input type="text" id="businessName" class="form-control" value="Libin Catering Service & Event Management" required>
-                  </div>
 
-                  <div class="row g-3 mb-3">
-                    <div class="col-md-6">
-                      <label class="form-label fw-bold">Primary Phone *</label>
-                      <input type="text" id="primaryPhone" class="form-control" value="+91 9677476609" required>
+              <!-- TAB 2: HERO BANNER CAROUSEL -->
+              <div class="tab-pane fade" id="heroBannersTab" role="tabpanel">
+                <div class="admin-card">
+                  <div class="admin-card-header d-flex justify-content-between align-items-center">
+                    <div>
+                      <h5 class="font-serif mb-0">Hero Banner Slides</h5>
+                      <small class="text-muted">Manage the culinary background slides & navigation pills on the homepage</small>
                     </div>
-                    <div class="col-md-6">
-                      <label class="form-label fw-bold">Secondary Phone</label>
-                      <input type="text" id="secondaryPhone" class="form-control" value="+91 9442779796">
-                    </div>
-                  </div>
-
-                  <div class="row g-3 mb-3">
-                    <div class="col-md-6">
-                      <label class="form-label fw-bold">WhatsApp Number *</label>
-                      <input type="text" id="whatsappNumber" class="form-control" value="+91 9442779796" required>
-                    </div>
-                    <div class="col-md-6">
-                      <label class="form-label fw-bold">Official Email *</label>
-                      <input type="email" id="businessEmail" class="form-control" value="libincateringservice@gmail.com" required>
-                    </div>
-                  </div>
-
-                  <div class="mb-3">
-                    <label class="form-label fw-bold">Physical Address</label>
-                    <textarea id="businessAddress" class="form-control" rows="2">Libin Catering Services, Tamil Nadu, India</textarea>
-                  </div>
-
-                  <div class="mb-3">
-                    <label class="form-label fw-bold">Google Maps Embed URL (iframe src)</label>
-                    <input type="url" id="mapEmbedUrl" class="form-control" value="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3948.3304938096355!2d77.1285269!3d8.3078817!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b05ab04435abe27%3A0x12a4c587ff77f9e!2sLibin%20Catering%20Services!5e0!3m2!1sen!2sin!4v1708850000000!5m2!1sen!2sin" placeholder="https://www.google.com/maps/embed?...">
-                  </div>
-
-                  <div class="mb-3">
-                    <label class="form-label fw-bold">Operating Hours</label>
-                    <input type="text" id="openingHours" class="form-control" value="Monday - Sunday: 7:00 AM - 10:30 PM (24/7 Event Booking)">
-                  </div>
-
-                  <h6 class="font-serif fw-bold mt-4 mb-3 border-top pt-3">Social Media Links</h6>
-                  <div class="row g-3 mb-4">
-                    <div class="col-md-4">
-                      <label class="form-label">Facebook URL</label>
-                      <input type="url" id="facebookUrl" class="form-control" placeholder="https://facebook.com/...">
-                    </div>
-                    <div class="col-md-4">
-                      <label class="form-label">Instagram URL</label>
-                      <input type="url" id="instagramUrl" class="form-control" placeholder="https://instagram.com/...">
-                    </div>
-                    <div class="col-md-4">
-                      <label class="form-label">YouTube URL</label>
-                      <input type="url" id="youtubeUrl" class="form-control" placeholder="https://youtube.com/...">
-                    </div>
-                  </div>
-
-                  <div class="d-flex justify-content-end">
-                    <button type="submit" class="btn btn-gold py-2 px-4">
-                      <i class="bi bi-save me-1"></i> Save Changes
+                    <button class="btn btn-gold btn-sm" id="btnAddHeroSlide">
+                      <i class="bi bi-plus-lg me-1"></i> Add Banner Slide
                     </button>
                   </div>
-                </form>
+                  <div class="admin-card-body p-0">
+                    <div class="table-responsive">
+                      <table class="table table-custom table-hover align-middle mb-0">
+                        <thead>
+                          <tr>
+                            <th>Slide Preview</th>
+                            <th>Dish Title Tag</th>
+                            <th>Nav Button Label</th>
+                            <th>Subtitle</th>
+                            <th>Order</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody id="heroSlidesTableBody">
+                          <!-- Rendered via js/contact-admin.js -->
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
               </div>
+
+              <!-- TAB 3: HERO HEADLINES & COPY -->
+              <div class="tab-pane fade" id="heroTextTab" role="tabpanel">
+                <div class="admin-card">
+                  <div class="admin-card-header">
+                    <h5 class="font-serif mb-0">Homepage Hero Copy & Headlines</h5>
+                  </div>
+                  <div class="admin-card-body">
+                    <form id="heroCopyForm">
+                      <div class="mb-3">
+                        <label class="form-label fw-bold">Hero Pill Badge</label>
+                        <input type="text" id="heroBadgeInput" class="form-control" value="Premium Catering & Event Management">
+                      </div>
+
+                      <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                          <label class="form-label fw-bold">Hero Title (Primary Line)</label>
+                          <input type="text" id="heroTitleInput" class="form-control" value="Exceptional Food.">
+                        </div>
+                        <div class="col-md-6">
+                          <label class="form-label fw-bold">Hero Subtitle (Gold Accent Line)</label>
+                          <input type="text" id="heroSubtitleInput" class="form-control" value="Unforgettable Celebrations.">
+                        </div>
+                      </div>
+
+                      <div class="mb-4">
+                        <label class="form-label fw-bold">Hero Description</label>
+                        <textarea id="heroDescInput" class="form-control" rows="3">Authentic flavours, thoughtful presentation and seamless catering for weddings, celebrations, corporate events and every occasion worth remembering.</textarea>
+                      </div>
+
+                      <div class="d-flex justify-content-end">
+                        <button type="submit" class="btn btn-gold py-2 px-4" id="btnSaveHeroCopy">
+                          <i class="bi bi-save me-1"></i> Save Hero Copy
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+
+              <!-- TAB 1: BUSINESS PROFILE & CONTACT -->
+              <div class="tab-pane fade show active" id="contactTab" role="tabpanel">
+                <div class="admin-card">
+                  <div class="admin-card-header">
+                    <h5 class="font-serif mb-0">Public Business Profile & Contact Details</h5>
+                  </div>
+                  <div class="admin-card-body">
+                    <form id="contactAdminForm">
+                      <div class="mb-3">
+                        <label class="form-label fw-bold">Business Name *</label>
+                        <input type="text" id="businessName" class="form-control" value="Libin Catering Service & Event Management" required>
+                      </div>
+
+                      <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                          <label class="form-label fw-bold">Primary Phone *</label>
+                          <input type="text" id="primaryPhone" class="form-control" value="+91 9677476609" required>
+                        </div>
+                        <div class="col-md-6">
+                          <label class="form-label fw-bold">Secondary Phone</label>
+                          <input type="text" id="secondaryPhone" class="form-control" value="+91 9442779796">
+                        </div>
+                      </div>
+
+                      <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                          <label class="form-label fw-bold">WhatsApp Number *</label>
+                          <input type="text" id="whatsappNumber" class="form-control" value="+91 9442779796" required>
+                        </div>
+                        <div class="col-md-6">
+                          <label class="form-label fw-bold">Official Email *</label>
+                          <input type="email" id="businessEmail" class="form-control" value="libincateringservice@gmail.com" required>
+                        </div>
+                      </div>
+
+                      <div class="mb-3">
+                        <label class="form-label fw-bold">Physical Address</label>
+                        <textarea id="businessAddress" class="form-control" rows="2">Libin Catering Services, Tamil Nadu, India</textarea>
+                      </div>
+
+                      <div class="mb-3">
+                        <label class="form-label fw-bold">Google Maps Embed URL (iframe src)</label>
+                        <input type="url" id="mapEmbedUrl" class="form-control" value="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3948.3304938096355!2d77.1285269!3d8.3078817!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b05ab04435abe27%3A0x12a4c587ff77f9e!2sLibin%20Catering%20Services!5e0!3m2!1sen!2sin!4v1708850000000!5m2!1sen!2sin" placeholder="https://www.google.com/maps/embed?...">
+                      </div>
+
+                      <div class="mb-3">
+                        <label class="form-label fw-bold">Operating Hours</label>
+                        <input type="text" id="openingHours" class="form-control" value="Monday - Sunday: 7:00 AM - 10:30 PM (24/7 Event Booking)">
+                      </div>
+
+                      <h6 class="font-serif fw-bold mt-4 mb-3 border-top pt-3">Social Media Links</h6>
+                      <div class="row g-3 mb-4">
+                        <div class="col-md-4">
+                          <label class="form-label">Facebook URL</label>
+                          <input type="url" id="facebookUrl" class="form-control" placeholder="https://facebook.com/...">
+                        </div>
+                        <div class="col-md-4">
+                          <label class="form-label">Instagram URL</label>
+                          <input type="url" id="instagramUrl" class="form-control" placeholder="https://instagram.com/...">
+                        </div>
+                        <div class="col-md-4">
+                          <label class="form-label">YouTube URL</label>
+                          <input type="url" id="youtubeUrl" class="form-control" placeholder="https://youtube.com/...">
+                        </div>
+                      </div>
+
+                      <div class="d-flex justify-content-end">
+                        <button type="submit" class="btn btn-gold py-2 px-4" id="btnSaveContact">
+                          <i class="bi bi-save me-1"></i> Save Changes
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+
             </div>
+
           </div>
         </div>
       </div>
     </main>
+  </div>
+
+  <!-- Hero Slide Modal -->
+  <div class="modal fade" id="heroSlideModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg">
+        <div class="modal-header bg-noir text-white py-3">
+          <h5 class="modal-title font-serif" id="heroSlideModalTitle">Add Hero Banner Slide</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body p-4 bg-white">
+          <form id="heroSlideForm">
+            <input type="hidden" id="heroSlideId">
+
+            <div class="mb-3">
+              <label class="form-label fw-bold">Dish / Showcase Title *</label>
+              <input type="text" id="slideDishName" class="form-control" placeholder="e.g. Kerala Malabar Dum Biryani" required>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-bold">Slider Nav Button Label *</label>
+              <input type="text" id="slideNavLabel" class="form-control" placeholder="e.g. Wood-Fired Dum Biryani" required>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-bold">Subtitle / Tagline</label>
+              <input type="text" id="slideSubtitle" class="form-control" placeholder="e.g. Slow cooked in giant copper cauldrons">
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-bold">Banner Background Photo (Upload File or URL) *</label>
+              <div class="row g-2 align-items-center mb-2">
+                <div class="col-md-6">
+                  <input type="file" id="slideFileInput" class="form-control" accept="image/*">
+                </div>
+                <div class="col-md-6">
+                  <input type="url" id="slideImageUrl" class="form-control" placeholder="Or image URL">
+                </div>
+              </div>
+              <div id="slideImagePreviewWrap" class="mt-2 p-2 bg-light rounded text-center" style="display: none;">
+                <img id="slideImagePreview" src="" alt="Slide Preview" class="rounded shadow-sm" style="max-height: 120px; width: auto;">
+              </div>
+            </div>
+
+            <div class="row g-3 mb-4">
+              <div class="col-md-6">
+                <label class="form-label fw-bold">Display Order</label>
+                <input type="number" id="slideDisplayOrder" class="form-control" value="0">
+              </div>
+              <div class="col-md-6 d-flex align-items-center pt-4">
+                <div class="form-check form-switch">
+                  <input class="form-check-input" type="checkbox" id="slideIsActive" checked>
+                  <label class="form-check-label fw-bold" for="slideIsActive">Active Slide</label>
+                </div>
+              </div>
+            </div>
+
+            <div class="d-flex justify-content-end gap-2">
+              <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+              <button type="submit" class="btn btn-gold" id="btnSaveHeroSlide">Save Slide</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Scripts -->

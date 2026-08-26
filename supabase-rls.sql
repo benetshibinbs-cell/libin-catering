@@ -10,6 +10,8 @@ ALTER TABLE public.events ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.enquiries ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.gallery ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.contact_information ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.services ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.hero_slides ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.site_settings ENABLE ROW LEVEL SECURITY;
 
 -- =============================================================================
@@ -155,7 +157,45 @@ USING (true)
 WITH CHECK (true);
 
 -- =============================================================================
--- 8. POLICIES: SITE SETTINGS
+-- 8. POLICIES: SIGNATURE SERVICES
+-- =============================================================================
+DROP POLICY IF EXISTS "Allow reading services" ON public.services;
+DROP POLICY IF EXISTS "Allow managing services" ON public.services;
+
+CREATE POLICY "Allow reading services"
+ON public.services
+FOR SELECT
+TO anon, authenticated
+USING (true);
+
+CREATE POLICY "Allow managing services"
+ON public.services
+FOR ALL
+TO anon, authenticated
+USING (true)
+WITH CHECK (true);
+
+-- =============================================================================
+-- 9. POLICIES: HERO BANNER SLIDES
+-- =============================================================================
+DROP POLICY IF EXISTS "Allow reading hero_slides" ON public.hero_slides;
+DROP POLICY IF EXISTS "Allow managing hero_slides" ON public.hero_slides;
+
+CREATE POLICY "Allow reading hero_slides"
+ON public.hero_slides
+FOR SELECT
+TO anon, authenticated
+USING (true);
+
+CREATE POLICY "Allow managing hero_slides"
+ON public.hero_slides
+FOR ALL
+TO anon, authenticated
+USING (true)
+WITH CHECK (true);
+
+-- =============================================================================
+-- 10. POLICIES: SITE SETTINGS
 -- =============================================================================
 DROP POLICY IF EXISTS "Public can view site settings" ON public.site_settings;
 DROP POLICY IF EXISTS "Authenticated users can manage site settings" ON public.site_settings;
@@ -176,7 +216,7 @@ USING (true)
 WITH CHECK (true);
 
 -- =============================================================================
--- 9. STORAGE BUCKET POLICIES (Supabase Storage: 'media' bucket)
+-- 11. STORAGE BUCKET POLICIES (Supabase Storage: 'media' bucket)
 -- =============================================================================
 -- Create bucket if not exists
 INSERT INTO storage.buckets (id, name, public) 

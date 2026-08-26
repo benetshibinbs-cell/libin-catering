@@ -10,9 +10,15 @@ window.APP_CONFIG = {
   supabaseUrl: (window.ENV && window.ENV.SUPABASE_URL) || 'https://robzbfskdmwhltfmvfsu.supabase.co',
   supabaseAnonKey: (window.ENV && window.ENV.SUPABASE_PUBLISHABLE_KEY) || 'sb_publishable_sD3Q6-t7ftBQTIhUTHaE_w_jChKouOe',
 
-  // Business Information
+  // Business Information & Branding
   business: {
     name: 'Libin Catering Service & Event Management',
+    logoUrl: 'assets/images/logo.png',
+    footerLogoUrl: 'assets/images/logo.png',
+    heroBadge: 'Premium Catering & Event Management',
+    heroTitle: 'Exceptional Food.',
+    heroSubtitle: 'Unforgettable Celebrations.',
+    heroDesc: 'Authentic flavours, thoughtful presentation and seamless catering for weddings, celebrations, corporate events and every occasion worth remembering.',
     primaryPhone: '+91 9677476609',
     secondaryPhone: '+91 9442779796',
     whatsapp: '+91 9442779796',

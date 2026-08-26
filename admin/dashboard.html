@@ -36,10 +36,11 @@
         <a href="dashboard.html" class="admin-nav-link active"><i class="bi bi-speedometer2"></i> Dashboard</a>
         <a href="menu.html" class="admin-nav-link"><i class="bi bi-book"></i> Menu Items</a>
         <a href="categories.html" class="admin-nav-link"><i class="bi bi-tags"></i> Categories</a>
+        <a href="services.html" class="admin-nav-link"><i class="bi bi-award"></i> Signature Services</a>
         <a href="events.html" class="admin-nav-link"><i class="bi bi-calendar-event"></i> Events</a>
         <a href="enquiries.html" class="admin-nav-link"><i class="bi bi-envelope-paper"></i> Enquiries</a>
         <a href="gallery.html" class="admin-nav-link"><i class="bi bi-images"></i> Gallery</a>
-        <a href="contact.html" class="admin-nav-link"><i class="bi bi-geo-alt"></i> Contact Info</a>
+        <a href="contact.html" class="admin-nav-link"><i class="bi bi-geo-alt"></i> Branding & Contact</a>
         <hr class="my-3 border-secondary">
         <a href="../index.html" target="_blank" class="admin-nav-link"><i class="bi bi-box-arrow-up-right"></i> View Live Site</a>
         <a href="#" class="admin-nav-link text-danger" data-action="admin-logout"><i class="bi bi-box-arrow-left text-danger"></i> Logout</a>
@@ -68,7 +69,7 @@
       <div class="admin-main-container">
         <!-- Stat Cards -->
         <div class="row g-4 mb-4">
-          <div class="col-sm-6 col-xl-3">
+          <div class="col-sm-6 col-xl">
             <div class="stat-card">
               <div>
                 <div class="stat-card-title">Menu Items</div>
@@ -77,7 +78,7 @@
               <div class="stat-card-icon"><i class="bi bi-egg-fried"></i></div>
             </div>
           </div>
-          <div class="col-sm-6 col-xl-3">
+          <div class="col-sm-6 col-xl">
             <div class="stat-card">
               <div>
                 <div class="stat-card-title">Categories</div>
@@ -86,16 +87,25 @@
               <div class="stat-card-icon"><i class="bi bi-tags-fill"></i></div>
             </div>
           </div>
-          <div class="col-sm-6 col-xl-3">
+          <div class="col-sm-6 col-xl">
             <div class="stat-card">
               <div>
-                <div class="stat-card-title">Upcoming Events</div>
+                <div class="stat-card-title">Services</div>
+                <div class="stat-card-val" id="countServices">0</div>
+              </div>
+              <div class="stat-card-icon"><i class="bi bi-award-fill"></i></div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-xl">
+            <div class="stat-card">
+              <div>
+                <div class="stat-card-title">Events</div>
                 <div class="stat-card-val" id="countEvents">0</div>
               </div>
               <div class="stat-card-icon"><i class="bi bi-calendar-check-fill"></i></div>
             </div>
           </div>
-          <div class="col-sm-6 col-xl-3">
+          <div class="col-sm-6 col-xl">
             <div class="stat-card">
               <div>
                 <div class="stat-card-title">New Enquiries</div>
@@ -114,7 +124,9 @@
           <div class="admin-card-body">
             <div class="d-flex flex-wrap gap-2">
               <a href="menu.html" class="btn btn-gold btn-sm"><i class="bi bi-plus-circle me-1"></i> Add Menu Item</a>
-              <a href="categories.html" class="btn btn-outline-dark btn-sm"><i class="bi bi-tag me-1"></i> Add Category</a>
+              <a href="services.html" class="btn btn-outline-dark btn-sm"><i class="bi bi-award me-1"></i> Manage Services</a>
+              <a href="contact.html" class="btn btn-outline-dark btn-sm"><i class="bi bi-card-image me-1"></i> Logo & Hero Banners</a>
+              <a href="categories.html" class="btn btn-outline-dark btn-sm"><i class="bi bi-tag me-1"></i> Categories</a>
               <a href="events.html" class="btn btn-outline-dark btn-sm"><i class="bi bi-calendar-plus me-1"></i> Add Event</a>
               <a href="gallery.html" class="btn btn-outline-dark btn-sm"><i class="bi bi-image me-1"></i> Upload Photo</a>
               <a href="enquiries.html" class="btn btn-primary btn-sm"><i class="bi bi-inboxes me-1"></i> View All Enquiries</a>

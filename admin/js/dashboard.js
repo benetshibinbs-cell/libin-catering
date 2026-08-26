@@ -6,6 +6,7 @@
 document.addEventListener('DOMContentLoaded', async () => {
   const countMenuEl = document.getElementById('countMenuItems');
   const countCategoryEl = document.getElementById('countCategories');
+  const countServicesEl = document.getElementById('countServices');
   const countEventEl = document.getElementById('countEvents');
   const countEnquiryEl = document.getElementById('countEnquiries');
   const recentEnquiriesBody = document.getElementById('recentEnquiriesTableBody');
@@ -14,6 +15,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
       const categories = await window.DB.getCategories();
       const menuItems = await window.DB.getMenuItems({ categorySlug: 'all', dietary: 'all' });
+      const services = await window.DB.getServices({ activeOnly: false });
       const events = await window.DB.getEvents({ publishedOnly: false });
 
       let enquiries = [];
@@ -44,6 +46,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       if (countMenuEl) countMenuEl.textContent = menuItems.length;
       if (countCategoryEl) countCategoryEl.textContent = categories.length;
+      if (countServicesEl) countServicesEl.textContent = services.length;
       if (countEventEl) countEventEl.textContent = events.length;
       
       const newEnquiries = enquiries.filter(e => e.status === 'New');
