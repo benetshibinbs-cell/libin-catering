@@ -1,54 +1,8 @@
 /**
- * LIBIN CATERING SERVICE & EVENT MANAGEMENT
- * Fail-Safe Admin Authentication Controller
+ * Administrative authentication and route guard.
+ * Access is granted only to a verified Supabase user listed in public.admin_users.
  */
-
 (function () {
-  const AUTH_KEY = 'libin_auth_token';
-  const USER_KEY = 'libin_admin_user';
-
-  // Multi-tier storage helper (localStorage + sessionStorage + cookie)
-  const AuthStore = {
-    isLoggedIn() {
-      try {
-        const ls = localStorage.getItem(AUTH_KEY) === 'true';
-        const ss = sessionStorage.getItem(AUTH_KEY) === 'true';
-        const ck = document.cookie.indexOf(AUTH_KEY + '=1') !== -1;
-        return ls || ss || ck;
-      } catch (e) {
-        return false;
-      }
-    },
-    getUserEmail() {
-      try {
-        return localStorage.getItem(USER_KEY) || sessionStorage.getItem(USER_KEY) || 'admin@libincatering.com';
-      } catch (e) {
-        return 'admin@libincatering.com';
-      }
-    },
-    login(email) {
-      const user = email || 'admin@libincatering.com';
-      try { localStorage.setItem(AUTH_KEY, 'true'); localStorage.setItem(USER_KEY, user); } catch (e) {}
-      try { sessionStorage.setItem(AUTH_KEY, 'true'); sessionStorage.setItem(USER_KEY, user); } catch (e) {}
-      try { document.cookie = `${AUTH_KEY}=1; path=/; max-age=86400; SameSite=Lax`; } catch (e) {}
-    },
-    logout() {
-      try { localStorage.removeItem(AUTH_KEY); localStorage.removeItem(USER_KEY); } catch (e) {}
-      try { sessionStorage.removeItem(AUTH_KEY); sessionStorage.removeItem(USER_KEY); } catch (e) {}
-      try { document.cookie = `${AUTH_KEY}=; path=/; max-age=0; SameSite=Lax`; } catch (e) {}
-
-      // Clear any Supabase token keys
-      try {
-        const toDelete = [];
-        for (let i = 0; i < localStorage.length; i++) {
-          const k = localStorage.key(i);
-          if (k && (k.startsWith('sb-') || k.includes('supabase'))) toDelete.push(k);
-        }
-        toDelete.forEach(k => localStorage.removeItem(k));
-      } catch (e) {}
-    }
-  };
-
   function isLoginPage() {
     const path = (window.location.pathname || '').toLowerCase().replace(/\\/g, '/');
     const file = path.split('/').pop();
@@ -56,96 +10,84 @@
   }
 
   function getClient() {
-    if (window.DB && window.DB.getClient) {
-      return window.DB.getClient();
-    }
-    return null;
+    return window.DB && typeof window.DB.getClient === 'function'
+      ? window.DB.getClient()
+      : null;
   }
 
-  // Route Guard: ONLY protect admin pages (NEVER auto-redirect from login page!)
-  function enforceRouteGuard() {
-    const onLogin = isLoginPage();
-    const loggedIn = AuthStore.isLoggedIn();
+  function redirectToLogin() {
+    window.location.replace('login.html');
+  }
 
-    // On protected admin pages (dashboard, menu, events, etc.):
-    // If not logged in, redirect to login.html
-    if (!onLogin && !loggedIn) {
-      window.location.href = 'login.html';
+  async function getVerifiedAdmin() {
+    const client = getClient();
+    if (!client) return null;
+
+    // getUser validates the session with Supabase Auth; do not trust browser storage.
+    const { data: userData, error: userError } = await client.auth.getUser();
+    const user = userData && userData.user;
+    if (userError || !user) return null;
+
+    // RLS exposes an allowlist row only to the corresponding administrator.
+    const { data: admin, error: adminError } = await client
+      .from('admin_users')
+      .select('user_id')
+      .eq('user_id', user.id)
+      .maybeSingle();
+
+    if (adminError || !admin) return null;
+    return user;
+  }
+
+  async function enforceRouteGuard() {
+    if (isLoginPage()) return true;
+
+    const user = await getVerifiedAdmin();
+    if (!user) {
+      redirectToLogin();
       return false;
     }
 
-    // On login.html: NEVER auto-redirect on load.
-    // The user stays on login.html until they explicitly submit the login form.
+    const userEmailEl = document.getElementById('adminUserEmail');
+    if (userEmailEl) userEmailEl.textContent = user.email || '';
     return true;
   }
 
-  // Handle Login submission
   window.handleAdminLogin = async function (email, password) {
-    if (!email || !password) {
-      throw new Error('Please enter both email and password.');
-    }
+    if (!email || !password) throw new Error('Enter your email and password.');
 
     const client = getClient();
+    if (!client) throw new Error('Authentication is temporarily unavailable.');
 
-    if (client) {
-      try {
-        const { data, error } = await client.auth.signInWithPassword({ email, password });
-        if (!error && data && data.user) {
-          AuthStore.login(data.user.email || email);
-          return data;
-        }
-        if (error) {
-          console.warn('Supabase auth notice:', error.message);
-        }
-      } catch (err) {
-        console.warn('Supabase signin error:', err);
-      }
+    const { data, error } = await client.auth.signInWithPassword({ email, password });
+    if (error || !data.user) {
+      // Keep the response generic to avoid disclosing which part of the credentials failed.
+      throw new Error('Invalid email or password.');
     }
 
-    // Demo / Offline fallback login (if Supabase user is not created yet)
-    if (password.length >= 6) {
-      AuthStore.login(email);
-      return { user: { email } };
-    } else {
-      throw new Error('Invalid credentials. Password must be at least 6 characters.');
+    const admin = await getVerifiedAdmin();
+    if (!admin) {
+      await client.auth.signOut();
+      throw new Error('This account is not authorized to access the admin area.');
     }
+
+    return { user: admin };
   };
 
-  // Handle Logout
   window.handleAdminLogout = async function () {
     const client = getClient();
-    if (client) {
-      try {
-        await Promise.race([
-          client.auth.signOut(),
-          new Promise(r => setTimeout(r, 500))
-        ]);
-      } catch (e) {
-        console.warn('Signout notice:', e);
-      }
-    }
-
-    AuthStore.logout();
-    window.location.href = 'login.html';
+    if (client) await client.auth.signOut();
+    redirectToLogin();
   };
 
-  // Run guard
-  enforceRouteGuard();
-
-  // DOM ready handlers
   document.addEventListener('DOMContentLoaded', () => {
-    // Show email in topbar
-    const userEmailEl = document.getElementById('adminUserEmail');
-    if (userEmailEl) {
-      userEmailEl.textContent = AuthStore.getUserEmail();
-    }
-
-    // Attach logout buttons
-    document.querySelectorAll('[data-action="admin-logout"]').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.preventDefault();
+    document.querySelectorAll('[data-action="admin-logout"]').forEach((button) => {
+      button.addEventListener('click', (event) => {
+        event.preventDefault();
         window.handleAdminLogout();
       });
     });
   });
+
+  enforceRouteGuard();
 })();

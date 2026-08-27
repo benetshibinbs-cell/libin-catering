@@ -1,262 +1,103 @@
--- =============================================================================
--- LIBIN CATERING SERVICE & EVENT MANAGEMENT
--- SUPABASE ROW LEVEL SECURITY (RLS) POLICIES
--- =============================================================================
+-- Security-hardened Supabase access policies for Libin Catering.
+-- Run this only after the initial administrator has a confirmed Supabase Auth account.
 
--- 1. Enable Row Level Security (RLS) on all tables
-ALTER TABLE public.categories ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.menu_items ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.events ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.enquiries ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.gallery ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.contact_information ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.services ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.hero_slides ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.site_settings ENABLE ROW LEVEL SECURITY;
+begin;
 
--- =============================================================================
--- 2. POLICIES: CATEGORIES
--- =============================================================================
-DROP POLICY IF EXISTS "Public can view active categories" ON public.categories;
-DROP POLICY IF EXISTS "Authenticated users can manage all categories" ON public.categories;
-DROP POLICY IF EXISTS "Allow reading categories" ON public.categories;
-DROP POLICY IF EXISTS "Allow managing categories" ON public.categories;
+create table if not exists public.admin_users (
+  user_id uuid primary key references auth.users(id) on delete cascade,
+  created_at timestamptz not null default now()
+);
+alter table public.admin_users enable row level security;
+revoke all on table public.admin_users from anon, authenticated;
+grant select on table public.admin_users to authenticated;
 
-CREATE POLICY "Allow reading categories"
-ON public.categories
-FOR SELECT
-TO anon, authenticated
-USING (true);
+-- Seed the confirmed initial administrator. Add later admins directly with an
+-- elevated database connection; never expose an admin-management UI to the public.
+insert into public.admin_users (user_id)
+select id from auth.users where email = 'admin@libincatering.com'
+on conflict (user_id) do nothing;
 
-CREATE POLICY "Allow managing categories"
-ON public.categories
-FOR ALL
-TO anon, authenticated
-USING (true)
-WITH CHECK (true);
+create schema if not exists private;
+revoke all on schema private from public;
 
--- =============================================================================
--- 3. POLICIES: MENU ITEMS
--- =============================================================================
-DROP POLICY IF EXISTS "Public can view available menu items" ON public.menu_items;
-DROP POLICY IF EXISTS "Authenticated users can manage all menu items" ON public.menu_items;
-DROP POLICY IF EXISTS "Allow reading menu items" ON public.menu_items;
-DROP POLICY IF EXISTS "Allow managing menu items" ON public.menu_items;
+create or replace function private.is_admin()
+returns boolean
+language sql
+stable
+security definer
+set search_path = pg_catalog, public
+as $$
+  select exists (
+    select 1 from public.admin_users where user_id = auth.uid()
+  );
+$$;
+revoke all on function private.is_admin() from public, anon, authenticated;
+grant execute on function private.is_admin() to authenticated;
 
-CREATE POLICY "Allow reading menu items"
-ON public.menu_items
-FOR SELECT
-TO anon, authenticated
-USING (true);
+drop policy if exists "Admin can read own membership" on public.admin_users;
+create policy "Admin can read own membership"
+on public.admin_users for select to authenticated
+using ((select auth.uid()) = user_id);
 
-CREATE POLICY "Allow managing menu items"
-ON public.menu_items
-FOR ALL
-TO anon, authenticated
-USING (true)
-WITH CHECK (true);
+drop policy if exists "Allow reading categories" on public.categories;
+drop policy if exists "Allow managing categories" on public.categories;
+drop policy if exists "Allow reading menu items" on public.menu_items;
+drop policy if exists "Allow managing menu items" on public.menu_items;
+drop policy if exists "Allow reading events" on public.events;
+drop policy if exists "Allow managing events" on public.events;
+drop policy if exists "Allow inserting enquiries" on public.enquiries;
+drop policy if exists "Allow reading enquiries" on public.enquiries;
+drop policy if exists "Allow updating enquiries" on public.enquiries;
+drop policy if exists "Allow deleting enquiries" on public.enquiries;
+drop policy if exists "Allow reading gallery" on public.gallery;
+drop policy if exists "Allow managing gallery" on public.gallery;
+drop policy if exists "Allow reading contact information" on public.contact_information;
+drop policy if exists "Allow managing contact information" on public.contact_information;
+drop policy if exists "Allow reading services" on public.services;
+drop policy if exists "Allow managing services" on public.services;
+drop policy if exists "Allow reading hero_slides" on public.hero_slides;
+drop policy if exists "Allow managing hero_slides" on public.hero_slides;
+drop policy if exists "Allow reading site_settings" on public.site_settings;
+drop policy if exists "Allow managing site_settings" on public.site_settings;
+drop policy if exists "Allow reading site settings" on public.site_settings;
+drop policy if exists "Allow managing site settings" on public.site_settings;
 
--- =============================================================================
--- 4. POLICIES: EVENTS
--- =============================================================================
-DROP POLICY IF EXISTS "Public can view published events" ON public.events;
-DROP POLICY IF EXISTS "Authenticated users can manage all events" ON public.events;
-DROP POLICY IF EXISTS "Allow reading events" ON public.events;
-DROP POLICY IF EXISTS "Allow managing events" ON public.events;
+create policy "Public reads active categories" on public.categories for select to anon, authenticated using (is_active = true);
+create policy "Admins manage categories" on public.categories for all to authenticated using ((select private.is_admin())) with check ((select private.is_admin()));
+create policy "Public reads available menu items" on public.menu_items for select to anon, authenticated using (is_available = true);
+create policy "Admins manage menu items" on public.menu_items for all to authenticated using ((select private.is_admin())) with check ((select private.is_admin()));
+create policy "Public reads published events" on public.events for select to anon, authenticated using (is_published = true);
+create policy "Admins manage events" on public.events for all to authenticated using ((select private.is_admin())) with check ((select private.is_admin()));
+create policy "Public submits enquiries" on public.enquiries for insert to anon, authenticated with check (true);
+create policy "Admins read enquiries" on public.enquiries for select to authenticated using ((select private.is_admin()));
+create policy "Admins update enquiries" on public.enquiries for update to authenticated using ((select private.is_admin())) with check ((select private.is_admin()));
+create policy "Admins delete enquiries" on public.enquiries for delete to authenticated using ((select private.is_admin()));
+create policy "Public reads published gallery" on public.gallery for select to anon, authenticated using (is_published = true);
+create policy "Admins manage gallery" on public.gallery for all to authenticated using ((select private.is_admin())) with check ((select private.is_admin()));
+create policy "Public reads contact information" on public.contact_information for select to anon, authenticated using (true);
+create policy "Admins manage contact information" on public.contact_information for all to authenticated using ((select private.is_admin())) with check ((select private.is_admin()));
+create policy "Public reads active services" on public.services for select to anon, authenticated using (is_active = true);
+create policy "Admins manage services" on public.services for all to authenticated using ((select private.is_admin())) with check ((select private.is_admin()));
+create policy "Public reads active hero slides" on public.hero_slides for select to anon, authenticated using (is_active = true);
+create policy "Admins manage hero slides" on public.hero_slides for all to authenticated using ((select private.is_admin())) with check ((select private.is_admin()));
+create policy "Public reads site settings" on public.site_settings for select to anon, authenticated using (true);
+create policy "Admins manage site settings" on public.site_settings for all to authenticated using ((select private.is_admin())) with check ((select private.is_admin()));
 
-CREATE POLICY "Allow reading events"
-ON public.events
-FOR SELECT
-TO anon, authenticated
-USING (true);
+drop policy if exists "Public media access" on storage.objects;
+drop policy if exists "Authenticated media upload" on storage.objects;
+drop policy if exists "Authenticated media update" on storage.objects;
+drop policy if exists "Authenticated media delete" on storage.objects;
+drop policy if exists "Media bucket upload access" on storage.objects;
+drop policy if exists "Media bucket update access" on storage.objects;
+drop policy if exists "Media bucket delete access" on storage.objects;
 
-CREATE POLICY "Allow managing events"
-ON public.events
-FOR ALL
-TO anon, authenticated
-USING (true)
-WITH CHECK (true);
+create policy "Public reads media" on storage.objects for select to anon, authenticated using (bucket_id = 'media');
+create policy "Admins upload media" on storage.objects for insert to authenticated with check (bucket_id = 'media' and (select private.is_admin()));
+create policy "Admins update media" on storage.objects for update to authenticated using (bucket_id = 'media' and (select private.is_admin())) with check (bucket_id = 'media' and (select private.is_admin()));
+create policy "Admins delete media" on storage.objects for delete to authenticated using (bucket_id = 'media' and (select private.is_admin()));
 
--- =============================================================================
--- 5. POLICIES: ENQUIRIES
--- =============================================================================
-DROP POLICY IF EXISTS "Public can submit enquiries" ON public.enquiries;
-DROP POLICY IF EXISTS "Authenticated users can view enquiries" ON public.enquiries;
-DROP POLICY IF EXISTS "Authenticated users can update enquiries" ON public.enquiries;
-DROP POLICY IF EXISTS "Authenticated users can delete enquiries" ON public.enquiries;
-DROP POLICY IF EXISTS "Allow reading enquiries" ON public.enquiries;
-DROP POLICY IF EXISTS "Allow inserting enquiries" ON public.enquiries;
-DROP POLICY IF EXISTS "Allow updating enquiries" ON public.enquiries;
-DROP POLICY IF EXISTS "Allow deleting enquiries" ON public.enquiries;
+alter function public.rls_auto_enable() set search_path = pg_catalog;
+revoke execute on function public.rls_auto_enable() from public, anon, authenticated;
+alter function public.set_updated_at_column() set search_path = pg_catalog;
 
-CREATE POLICY "Allow inserting enquiries"
-ON public.enquiries
-FOR INSERT
-TO anon, authenticated
-WITH CHECK (true);
-
-CREATE POLICY "Allow reading enquiries"
-ON public.enquiries
-FOR SELECT
-TO anon, authenticated
-USING (true);
-
-CREATE POLICY "Allow updating enquiries"
-ON public.enquiries
-FOR UPDATE
-TO anon, authenticated
-USING (true)
-WITH CHECK (true);
-
-CREATE POLICY "Allow deleting enquiries"
-ON public.enquiries
-FOR DELETE
-TO anon, authenticated
-USING (true);
-
--- =============================================================================
--- 6. POLICIES: GALLERY
--- =============================================================================
-DROP POLICY IF EXISTS "Public can view published gallery" ON public.gallery;
-DROP POLICY IF EXISTS "Authenticated users can manage gallery" ON public.gallery;
-DROP POLICY IF EXISTS "Allow reading gallery" ON public.gallery;
-DROP POLICY IF EXISTS "Allow managing gallery" ON public.gallery;
-
-CREATE POLICY "Allow reading gallery"
-ON public.gallery
-FOR SELECT
-TO anon, authenticated
-USING (true);
-
-CREATE POLICY "Allow managing gallery"
-ON public.gallery
-FOR ALL
-TO anon, authenticated
-USING (true)
-WITH CHECK (true);
-
--- =============================================================================
--- 7. POLICIES: CONTACT INFORMATION
--- =============================================================================
-DROP POLICY IF EXISTS "Public can view contact information" ON public.contact_information;
-DROP POLICY IF EXISTS "Authenticated users can manage contact information" ON public.contact_information;
-DROP POLICY IF EXISTS "Allow reading contact information" ON public.contact_information;
-DROP POLICY IF EXISTS "Allow managing contact information" ON public.contact_information;
-
-CREATE POLICY "Allow reading contact information"
-ON public.contact_information
-FOR SELECT
-TO anon, authenticated
-USING (true);
-
-CREATE POLICY "Allow managing contact information"
-ON public.contact_information
-FOR ALL
-TO anon, authenticated
-USING (true)
-WITH CHECK (true);
-
--- =============================================================================
--- 8. POLICIES: SIGNATURE SERVICES
--- =============================================================================
-DROP POLICY IF EXISTS "Allow reading services" ON public.services;
-DROP POLICY IF EXISTS "Allow managing services" ON public.services;
-
-CREATE POLICY "Allow reading services"
-ON public.services
-FOR SELECT
-TO anon, authenticated
-USING (true);
-
-CREATE POLICY "Allow managing services"
-ON public.services
-FOR ALL
-TO anon, authenticated
-USING (true)
-WITH CHECK (true);
-
--- =============================================================================
--- 9. POLICIES: HERO BANNER SLIDES
--- =============================================================================
-DROP POLICY IF EXISTS "Allow reading hero_slides" ON public.hero_slides;
-DROP POLICY IF EXISTS "Allow managing hero_slides" ON public.hero_slides;
-
-CREATE POLICY "Allow reading hero_slides"
-ON public.hero_slides
-FOR SELECT
-TO anon, authenticated
-USING (true);
-
-CREATE POLICY "Allow managing hero_slides"
-ON public.hero_slides
-FOR ALL
-TO anon, authenticated
-USING (true)
-WITH CHECK (true);
-
--- =============================================================================
--- 10. POLICIES: SITE SETTINGS
--- =============================================================================
-DROP POLICY IF EXISTS "Public can view site settings" ON public.site_settings;
-DROP POLICY IF EXISTS "Authenticated users can manage site settings" ON public.site_settings;
-DROP POLICY IF EXISTS "Allow reading site settings" ON public.site_settings;
-DROP POLICY IF EXISTS "Allow managing site settings" ON public.site_settings;
-
-CREATE POLICY "Allow reading site settings"
-ON public.site_settings
-FOR SELECT
-TO anon, authenticated
-USING (true);
-
-CREATE POLICY "Allow managing site settings"
-ON public.site_settings
-FOR ALL
-TO anon, authenticated
-USING (true)
-WITH CHECK (true);
-
--- =============================================================================
--- 11. STORAGE BUCKET POLICIES (Supabase Storage: 'media' bucket)
--- =============================================================================
--- Create bucket if not exists
-INSERT INTO storage.buckets (id, name, public) 
-VALUES ('media', 'media', true)
-ON CONFLICT (id) DO NOTHING;
-
--- Drop existing policies if any to prevent duplicate policy errors
-DROP POLICY IF EXISTS "Public media access" ON storage.objects;
-DROP POLICY IF EXISTS "Authenticated media upload" ON storage.objects;
-DROP POLICY IF EXISTS "Authenticated media update" ON storage.objects;
-DROP POLICY IF EXISTS "Authenticated media delete" ON storage.objects;
-DROP POLICY IF EXISTS "Media bucket upload access" ON storage.objects;
-DROP POLICY IF EXISTS "Media bucket update access" ON storage.objects;
-DROP POLICY IF EXISTS "Media bucket delete access" ON storage.objects;
-
--- 1. Public: Read media objects
-CREATE POLICY "Public media access"
-ON storage.objects
-FOR SELECT
-TO anon, authenticated
-USING (bucket_id = 'media');
-
--- 2. Upload media objects (Anon & Authenticated for web admin dashboard)
-CREATE POLICY "Media bucket upload access"
-ON storage.objects
-FOR INSERT
-TO anon, authenticated
-WITH CHECK (bucket_id = 'media');
-
--- 3. Update media objects
-CREATE POLICY "Media bucket update access"
-ON storage.objects
-FOR UPDATE
-TO anon, authenticated
-USING (bucket_id = 'media')
-WITH CHECK (bucket_id = 'media');
-
--- 4. Delete media objects
-CREATE POLICY "Media bucket delete access"
-ON storage.objects
-FOR DELETE
-TO anon, authenticated
-USING (bucket_id = 'media');
+commit;
